@@ -14,13 +14,20 @@ persons = [
   { ID: 2, Age: 2, Name: 'G' },
   { ID: 2, Age: 18, Name: 'C' },
   { ID: 1, Age: 30, Name: 'D' },
-  { ID: 1, Age: 25, Name: 'E' } ,
+  { ID: 1, Age: 25, Name: 'E' },
   { ID: 2, Age: 15, Name: 'F' }
 ];
 
 orderByID = new List<Person>(persons).OrderByDescending(x => x.ID).ToArray();
-thenByAge = new List<Person>(persons).OrderByDescending(x => x.ID).ThenBy(x => x.Age).ToArray();
-thenByName = new List<Person>(persons).OrderByDescending(x => x.ID).ThenBy(x => x.Age).ThenByDescending(x => x.Name).ToArray();
+thenByAge = new List<Person>(persons)
+  .OrderByDescending(x => x.ID)
+  .ThenBy(x => x.Age)
+  .ToArray();
+thenByName = new List<Person>(persons)
+  .OrderByDescending(x => x.ID)
+  .ThenBy(x => x.Age)
+  .ThenByDescending(x => x.Name)
+  .ToArray();
 
 console.log('orderByID:', orderByID);
 console.log('thenByAge:', thenByAge);
