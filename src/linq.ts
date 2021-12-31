@@ -319,7 +319,7 @@ class List<T> {
    */
   public OrderBy(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, false)): List<T> {
     // tslint:disable-next-line: no-use-before-declare
-    return new OrderedList<T>(this._elements, comparer);
+    return new OrderedList<T>(Tools.cloneDeep(this._elements), comparer);
   }
 
   /**
@@ -327,7 +327,7 @@ class List<T> {
    */
   public OrderByDescending(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, true)): List<T> {
     // tslint:disable-next-line: no-use-before-declare
-    return new OrderedList<T>(this._elements, comparer);
+    return new OrderedList<T>(Tools.cloneDeep(this._elements), comparer);
   }
 
   /**
@@ -592,6 +592,48 @@ class Tools {
         return 0;
       }
     };
+
+  /**
+   * clone
+   */
+  static cloneDeep = <T>(obj: T) => {
+    let copy, k, o, v;
+    if (null === obj || 'object' !== typeof obj) {
+      // Handle the 3 simple types, and null or undefined
+      return obj;
+    }
+    // Handle Date
+    if (obj instanceof Date) {
+      copy = new Date();
+      copy.setTime(obj.getTime());
+      return copy;
+    }
+    // Handle Array
+    if (obj instanceof Array) {
+      copy = function () {
+        let j, len, results;
+        results = [];
+        for (j = 0, len = obj.length; j < len; j++) {
+          o = obj[j];
+          results.push(Tools.cloneDeep(o));
+        }
+        return results;
+      }.call(this);
+      return copy;
+    }
+    // Handle Object
+    if (obj instanceof Object) {
+      copy = {};
+      for (k in obj) {
+        v = obj[k];
+        if (obj.hasOwnProperty(k)) {
+          copy[k] = Tools.cloneDeep(v);
+        }
+      }
+      return copy;
+    }
+    throw new Error("Unable to copy obj! Its type isn't supported.");
+  };
 }
 
 export default List;
