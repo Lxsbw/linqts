@@ -1,5 +1,5 @@
 // jslinq = require('../linqjs/linq');
-import List from '../linq';
+import Linq from '../linq';
 
 const parameters = [
   {
@@ -24,7 +24,7 @@ const parameters = [
   }
 ];
 
-const results = new List(parameters)
+const results = new Linq(parameters)
   .Select(value => {
     return {
       ID: value.ID,
@@ -33,6 +33,6 @@ const results = new List(parameters)
   })
   .ToArray();
 
-const results2 = new List(parameters).Select(value => value.Name).ToArray();
+const results2 = new Linq(parameters).Select(value => value.Name).ToArray();
 
 console.log('results:', results, results2);

@@ -5,7 +5,7 @@ interface GroupType<T> {
   elements?: any;
 }
 
-class List<T> {
+class Linq<T> {
   protected _elements: T[];
 
   /**
@@ -16,28 +16,28 @@ class List<T> {
   }
 
   /**
-   * Adds an object to the end of the List<T>.
+   * Adds an object to the end of the Linq<T>.
    */
   public Add(element: T): void {
     this._elements.push(element);
   }
 
   /**
-   * Appends an object to the end of the List<T>.
+   * Appends an object to the end of the Linq<T>.
    */
   public Append(element: T): void {
     this.Add(element);
   }
 
   /**
-   * Add an object to the start of the List<T>.
+   * Add an object to the start of the Linq<T>.
    */
   public Prepend(element: T): void {
     this._elements.unshift(element);
   }
 
   /**
-   * Adds the elements of the specified collection to the end of the List<T>.
+   * Adds the elements of the specified collection to the end of the Linq<T>.
    */
   public AddRange(elements: T[]): void {
     this._elements.push(...elements);
@@ -79,12 +79,12 @@ class List<T> {
   /**
    * Casts the elements of a sequence to the specified type.
    */
-  public Cast<U>(): List<U> {
-    return new List<U>(this._elements as any);
+  public Cast<U>(): Linq<U> {
+    return new Linq<U>(this._elements as any);
   }
 
   /**
-   * Removes all elements from the List<T>.
+   * Removes all elements from the Linq<T>.
    */
   public Clear(): void {
     this._elements.length = 0;
@@ -93,12 +93,12 @@ class List<T> {
   /**
    * Concatenates two sequences.
    */
-  public Concat(list: List<T>): List<T> {
-    return new List<T>(this._elements.concat(list.ToArray()));
+  public Concat(list: Linq<T>): Linq<T> {
+    return new Linq<T>(this._elements.concat(list.ToArray()));
   }
 
   /**
-   * Determines whether an element is in the List<T>.
+   * Determines whether an element is in the Linq<T>.
    */
   public Contains(element: T): boolean {
     return this.Any(x => x === element);
@@ -117,26 +117,26 @@ class List<T> {
    * Returns the elements of the specified sequence or the type parameter's default value
    * in a singleton collection if the sequence is empty.
    */
-  public DefaultIfEmpty(defaultValue?: T): List<T> {
-    return this.Count() ? this : new List<T>([defaultValue]);
+  public DefaultIfEmpty(defaultValue?: T): Linq<T> {
+    return this.Count() ? this : new Linq<T>([defaultValue]);
   }
 
   /**
    * Returns distinct elements from a sequence by using the default equality comparer to compare values.
    */
-  public Distinct(): List<T> {
+  public Distinct(): Linq<T> {
     return this.Where((value, index, iter) => (Tools.isObj(value) ? iter.findIndex(obj => Tools.equal(obj, value)) : iter.indexOf(value)) === index);
   }
 
   /**
    * Returns distinct elements from a sequence according to specified key selector.
    */
-  public DistinctBy(keySelector: (key: T) => string | number): List<T> {
+  public DistinctBy(keySelector: (key: T) => string | number): Linq<T> {
     const groups = this.GroupBy(keySelector);
     return Object.keys(groups).reduce((res, key) => {
       res.Add(groups[key][0]);
       return res;
-    }, new List<T>());
+    }, new Linq<T>());
   }
 
   /**
@@ -160,7 +160,7 @@ class List<T> {
   /**
    * Produces the set difference of two sequences by using the default equality comparer to compare values.
    */
-  public Except(source: List<T>): List<T> {
+  public Except(source: Linq<T>): Linq<T> {
     return this.Where(x => !source.Contains(x));
   }
 
@@ -187,7 +187,7 @@ class List<T> {
   }
 
   /**
-   * Performs the specified action on each element of the List<T>.
+   * Performs the specified action on each element of the Linq<T>.
    */
   public ForEach(action: (value?: T, index?: number, list?: T[]) => any): void {
     return this._elements.forEach(action);
@@ -200,7 +200,7 @@ class List<T> {
     const initialValue: TResult[] = [];
     const func = function (ac: GroupType<TOut>[], v: T) {
       const key = grouper(v);
-      const existingGroup = new List<GroupType<TOut>>(ac).FirstOrDefault(x => Tools.equal(x.key, key));
+      const existingGroup = new Linq<GroupType<TOut>>(ac).FirstOrDefault(x => Tools.equal(x.key, key));
       const mappedValue = mapper(v);
 
       if (existingGroup) {
@@ -219,7 +219,7 @@ class List<T> {
    * Correlates the elements of two sequences based on equality of keys and groups the results.
    * The default equality comparer is used to compare keys.
    */
-  public GroupJoin<U, R>(list: List<U>, key1: (k: T) => any, key2: (k: U) => any, result: (first: T, second: List<U>) => R): List<R> {
+  public GroupJoin<U, R>(list: Linq<U>, key1: (k: T) => any, key2: (k: U) => any, result: (first: T, second: Linq<U>) => R): Linq<R> {
     return this.Select(x =>
       result(
         x,
@@ -236,7 +236,7 @@ class List<T> {
   }
 
   /**
-   * Inserts an element into the List<T> at the specified index.
+   * Inserts an element into the Linq<T> at the specified index.
    */
   public Insert(index: number, element: T): void | Error {
     if (index < 0 || index > this._elements.length) {
@@ -249,14 +249,14 @@ class List<T> {
   /**
    * Produces the set intersection of two sequences by using the default equality comparer to compare values.
    */
-  public Intersect(source: List<T>): List<T> {
+  public Intersect(source: Linq<T>): Linq<T> {
     return this.Where(x => source.Contains(x));
   }
 
   /**
    * Correlates the elements of two sequences based on matching keys. The default equality comparer is used to compare keys.
    */
-  public Join<U, R>(list: List<U>, key1: (key: T) => any, key2: (key: U) => any, result: (first: T, second: U) => R): List<R> {
+  public Join<U, R>(list: Linq<U>, key1: (key: T) => any, key2: (key: U) => any, result: (first: T, second: U) => R): Linq<R> {
     return this.SelectMany(x => list.Where(y => key2(y) === key1(x)).Select(z => result(x, z)));
   }
 
@@ -305,7 +305,7 @@ class List<T> {
   /**
    * Filters the elements of a sequence based on a specified type.
    */
-  public OfType<U>(type: any): List<U> {
+  public OfType<U>(type: any): Linq<U> {
     let typeName;
     switch (type) {
       case Number:
@@ -330,7 +330,7 @@ class List<T> {
   /**
    * Sorts the elements of a sequence in ascending order according to a key.
    */
-  public OrderBy(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, false)): List<T> {
+  public OrderBy(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, false)): Linq<T> {
     // tslint:disable-next-line: no-use-before-declare
     return new OrderedList<T>(Tools.cloneDeep(this._elements), comparer);
   }
@@ -338,7 +338,7 @@ class List<T> {
   /**
    * Sorts the elements of a sequence in descending order according to a key.
    */
-  public OrderByDescending(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, true)): List<T> {
+  public OrderByDescending(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, true)): Linq<T> {
     // tslint:disable-next-line: no-use-before-declare
     return new OrderedList<T>(Tools.cloneDeep(this._elements), comparer);
   }
@@ -346,19 +346,19 @@ class List<T> {
   /**
    * Performs a subsequent ordering of the elements in a sequence in ascending order according to a key.
    */
-  public ThenBy(keySelector: (key: T) => any): List<T> {
+  public ThenBy(keySelector: (key: T) => any): Linq<T> {
     return this.OrderBy(keySelector);
   }
 
   /**
    * Performs a subsequent ordering of the elements in a sequence in descending order, according to a key.
    */
-  public ThenByDescending(keySelector: (key: T) => any): List<T> {
+  public ThenByDescending(keySelector: (key: T) => any): Linq<T> {
     return this.OrderByDescending(keySelector);
   }
 
   /**
-   * Removes the first occurrence of a specific object from the List<T>.
+   * Removes the first occurrence of a specific object from the Linq<T>.
    */
   public Remove(element: T): boolean {
     return this.IndexOf(element) !== -1 ? (this.RemoveAt(this.IndexOf(element)), true) : false;
@@ -367,42 +367,42 @@ class List<T> {
   /**
    * Removes all the elements that match the conditions defined by the specified predicate.
    */
-  public RemoveAll(predicate: PredicateType<T>): List<T> {
+  public RemoveAll(predicate: PredicateType<T>): Linq<T> {
     return this.Where(Tools.negate(predicate));
   }
 
   /**
-   * Removes the element at the specified index of the List<T>.
+   * Removes the element at the specified index of the Linq<T>.
    */
   public RemoveAt(index: number): void {
     this._elements.splice(index, 1);
   }
 
   /**
-   * Reverses the order of the elements in the entire List<T>.
+   * Reverses the order of the elements in the entire Linq<T>.
    */
-  public Reverse(): List<T> {
-    return new List<T>(this._elements.reverse());
+  public Reverse(): Linq<T> {
+    return new Linq<T>(this._elements.reverse());
   }
 
   /**
    * Projects each element of a sequence into a new form.
    */
-  public Select<TOut>(selector: (element: T, index: number) => TOut): List<TOut> {
-    return new List<TOut>(this._elements.map(selector));
+  public Select<TOut>(selector: (element: T, index: number) => TOut): Linq<TOut> {
+    return new Linq<TOut>(this._elements.map(selector));
   }
 
   /**
    * Projects each element of a sequence to a List<any> and flattens the resulting sequences into one sequence.
    */
-  public SelectMany<TOut extends List<any>>(selector: (element: T, index: number) => TOut): TOut {
-    return this.Aggregate((ac, _, i) => (ac.AddRange(this.Select(selector).ElementAt(i).ToArray()), ac), new List<TOut>());
+  public SelectMany<TOut extends Linq<any>>(selector: (element: T, index: number) => TOut): TOut {
+    return this.Aggregate((ac, _, i) => (ac.AddRange(this.Select(selector).ElementAt(i).ToArray()), ac), new Linq<TOut>());
   }
 
   /**
    * Determines whether two sequences are Tools.equal by comparing the elements by using the default equality comparer for their type.
    */
-  public SequenceEqual(list: List<T>): boolean {
+  public SequenceEqual(list: Linq<T>): boolean {
     return this.All(e => list.Contains(e));
   }
 
@@ -428,21 +428,21 @@ class List<T> {
   /**
    * Bypasses a specified number of elements in a sequence and then returns the remaining elements.
    */
-  public Skip(amount: number): List<T> {
-    return new List<T>(this._elements.slice(Math.max(0, amount)));
+  public Skip(amount: number): Linq<T> {
+    return new Linq<T>(this._elements.slice(Math.max(0, amount)));
   }
 
   /**
    * Omit the last specified number of elements in a sequence and then returns the remaining elements.
    */
-  public SkipLast(amount: number): List<T> {
-    return new List<T>(this._elements.slice(0, -Math.max(0, amount)));
+  public SkipLast(amount: number): Linq<T> {
+    return new Linq<T>(this._elements.slice(0, -Math.max(0, amount)));
   }
 
   /**
    * Bypasses elements in a sequence as long as a specified condition is true and then returns the remaining elements.
    */
-  public SkipWhile(predicate: PredicateType<T>): List<T> {
+  public SkipWhile(predicate: PredicateType<T>): Linq<T> {
     return this.Skip(this.Aggregate(ac => (predicate(this.ElementAt(ac)) ? ++ac : ac), 0));
   }
 
@@ -459,37 +459,37 @@ class List<T> {
   /**
    * Returns a specified number of contiguous elements from the start of a sequence.
    */
-  public Take(amount: number): List<T> {
-    return new List<T>(this._elements.slice(0, Math.max(0, amount)));
+  public Take(amount: number): Linq<T> {
+    return new Linq<T>(this._elements.slice(0, Math.max(0, amount)));
   }
 
   /**
    * Returns a specified number of contiguous elements from the end of a sequence.
    */
-  public TakeLast(amount: number): List<T> {
-    return new List<T>(this._elements.slice(-Math.max(0, amount)));
+  public TakeLast(amount: number): Linq<T> {
+    return new Linq<T>(this._elements.slice(-Math.max(0, amount)));
   }
 
   /**
    * Returns elements from a sequence as long as a specified condition is true.
    */
-  public TakeWhile(predicate: PredicateType<T>): List<T> {
+  public TakeWhile(predicate: PredicateType<T>): Linq<T> {
     return this.Take(this.Aggregate(ac => (predicate(this.ElementAt(ac)) ? ++ac : ac), 0));
   }
 
   /**
-   * Copies the elements of the List<T> to a new array.
+   * Copies the elements of the Linq<T> to a new array.
    */
   public ToArray(): T[] {
     return this._elements;
   }
 
   /**
-   * Creates a Dictionary<TKey, TValue> from a List<T> according to a specified key selector function.
+   * Creates a Dictionary<TKey, TValue> from a Linq<T> according to a specified key selector function.
    */
-  public ToDictionary<TKey>(key: (key: T) => TKey): List<{ Key: TKey; Value: T }>;
-  public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value: (value: T) => TValue): List<{ Key: TKey; Value: T | TValue }>;
-  public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value?: (value: T) => TValue): List<{ Key: TKey; Value: T | TValue }> {
+  public ToDictionary<TKey>(key: (key: T) => TKey): Linq<{ Key: TKey; Value: T }>;
+  public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }>;
+  public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value?: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }> {
     return this.Aggregate((dicc, v, i) => {
       dicc[this.Select(key).ElementAt(i).toString()] = value ? this.Select(value).ElementAt(i) : v;
       dicc.Add({
@@ -497,13 +497,13 @@ class List<T> {
         Value: value ? this.Select(value).ElementAt(i) : v
       });
       return dicc;
-    }, new List<{ Key: TKey; Value: T | TValue }>());
+    }, new Linq<{ Key: TKey; Value: T | TValue }>());
   }
 
   /**
-   * Creates a List<T> from an Enumerable.List<T>.
+   * Creates a Linq<T> from an Enumerable.Linq<T>.
    */
-  public ToList(): List<T> {
+  public ToList(): Linq<T> {
     return this;
   }
 
@@ -517,21 +517,21 @@ class List<T> {
   /**
    * Produces the set union of two sequences by using the default equality comparer.
    */
-  public Union(list: List<T>): List<T> {
+  public Union(list: Linq<T>): Linq<T> {
     return this.Concat(list).Distinct();
   }
 
   /**
    * Filters a sequence of values based on a predicate.
    */
-  public Where(predicate: PredicateType<T>): List<T> {
-    return new List<T>(this._elements.filter(predicate));
+  public Where(predicate: PredicateType<T>): Linq<T> {
+    return new Linq<T>(this._elements.filter(predicate));
   }
 
   /**
    * Applies a specified function to the corresponding elements of two sequences, producing a sequence of the results.
    */
-  public Zip<U, TOut>(list: List<U>, result: (first: T, second: U) => TOut): List<TOut> {
+  public Zip<U, TOut>(list: Linq<U>, result: (first: T, second: U) => TOut): Linq<TOut> {
     return list.Count() < this.Count() ? list.Select((x, y) => result(this.ElementAt(y), x)) : this.Select((x, y) => result(x, list.ElementAt(y)));
   }
 }
@@ -542,7 +542,7 @@ class List<T> {
  * The query represented by this method is not executed until the object is enumerated either by
  * calling its ToDictionary, ToLookup, ToList or ToArray methods
  */
-class OrderedList<T> extends List<T> {
+class OrderedList<T> extends Linq<T> {
   constructor(elements: T[], private _comparer: (a: T, b: T) => number) {
     super(elements);
     this._elements.sort(this._comparer);
@@ -552,7 +552,7 @@ class OrderedList<T> extends List<T> {
    * Performs a subsequent ordering of the elements in a sequence in ascending order according to a key.
    * @override
    */
-  public ThenBy(keySelector: (key: T) => any): List<T> {
+  public ThenBy(keySelector: (key: T) => any): Linq<T> {
     return new OrderedList(this._elements, Tools.composeComparers(this._comparer, Tools.keyComparer(keySelector, false)));
   }
 
@@ -560,7 +560,7 @@ class OrderedList<T> extends List<T> {
    * Performs a subsequent ordering of the elements in a sequence in descending order, according to a key.
    * @override
    */
-  public ThenByDescending(keySelector: (key: T) => any): List<T> {
+  public ThenByDescending(keySelector: (key: T) => any): Linq<T> {
     return new OrderedList(this._elements, Tools.composeComparers(this._comparer, Tools.keyComparer(keySelector, true)));
   }
 }
@@ -649,4 +649,4 @@ class Tools {
   };
 }
 
-export default List;
+export default Linq;

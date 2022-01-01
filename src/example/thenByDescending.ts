@@ -1,6 +1,6 @@
 let orderByID, persons, thenByAge, thenByName;
 
-import List from '../linq';
+import Linq from '../linq';
 
 interface Person {
   ID: number;
@@ -18,12 +18,12 @@ persons = [
   { ID: 2, Age: 15, Name: 'F' }
 ];
 
-orderByID = new List<Person>(persons).OrderByDescending(x => x.ID).ToArray();
-thenByAge = new List<Person>(persons)
+orderByID = new Linq<Person>(persons).OrderByDescending(x => x.ID).ToArray();
+thenByAge = new Linq<Person>(persons)
   .OrderByDescending(x => x.ID)
   .ThenBy(x => x.Age)
   .ToArray();
-thenByName = new List<Person>(persons)
+thenByName = new Linq<Person>(persons)
   .OrderByDescending(x => x.ID)
   .ThenBy(x => x.Age)
   .ThenByDescending(x => x.Name)

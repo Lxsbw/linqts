@@ -1,4 +1,11 @@
-import List from '../linq';
+import Linq from '../linq';
+
+interface GroupObj {
+  id: number;
+  name: string;
+  category: string;
+  countries: string[];
+}
 
 let data = [
   { id: 1, name: 'one', category: 'fruits', countries: ['lxsbw', 'xliecz'] },
@@ -10,9 +17,9 @@ let data = [
 ];
 
 // 分组
-let result = null;
-// result = new List(data).GroupBy(el => el.category);
-result = new List(data).GroupBy(el => {
+// let result = null;
+// let result = new Linq(data).GroupBy(el => el.category);
+let result = new Linq<GroupObj>(data).GroupBy(el => {
   return { id: el.id, category: el.category };
 });
 
