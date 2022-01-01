@@ -18,17 +18,17 @@ let data = [
 
 // 分组
 // let result = null;
-// let result = new Linq(data).GroupBy(el => el.category);
-let result = new Linq<GroupObj>(data).GroupBy(el => {
-  return { id: el.id, category: el.category };
-});
+let result = new Linq(data).GroupBy(el => el.category);
+// let result = new Linq<GroupObj>(data).GroupBy(el => {
+//   return { id: el.id, category: el.category };
+// });
+
+// let result = new Linq(data).ToLookup(el => el.category);
 
 // 去重
-// result = new List(data)
-//   .distinctBy((x) => x.category)
-//   .toArray();
-// result = new List(data)
-//   .DistinctBy((el) => {
+// let result = new Linq(data).DistinctBy(x => x.category).ToArray();
+// let result = new Linq(data)
+//   .DistinctBy(el => {
 //     return { id: el.id, category: el.category };
 //   })
 //   .ToArray();

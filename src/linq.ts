@@ -131,12 +131,17 @@ class Linq<T> {
   /**
    * Returns distinct elements from a sequence according to specified key selector.
    */
-  public DistinctBy(keySelector: (key: T) => string | number): Linq<T> {
-    const groups = this.GroupBy(keySelector);
-    return Object.keys(groups).reduce((res, key) => {
-      res.Add(groups[key][0]);
+  public DistinctBy<TOut>(keySelector: (key: T) => TOut): Linq<T> {
+    const groups: any = this.GroupBy(keySelector);
+    const func = function (res: Linq<T>, key: T) {
+      const curr = new Linq<GroupType<T>>(groups).FirstOrDefault(x => Tools.equal(x.key, key));
+      res.Add(curr.elements[0]);
       return res;
-    }, new Linq<T>());
+    };
+    return new Linq<GroupType<T>>(groups)
+      .Select(x => x.key)
+      .ToArray()
+      .reduce(func, new Linq<T>());
   }
 
   /**
