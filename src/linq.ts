@@ -1,4 +1,9 @@
 type PredicateType<T> = (value?: T, index?: number, list?: T[]) => boolean;
+interface GroupType<T> {
+  key?: T;
+  count?: number;
+  elements?: any;
+}
 
 class List<T> {
   protected _elements: T[];
@@ -191,15 +196,23 @@ class List<T> {
   /**
    * Groups the elements of a sequence according to a specified key selector function.
    */
-  public GroupBy<TResult = T>(grouper: (key: T) => string | number, mapper: (element: T) => TResult = val => val as unknown as TResult): { [key: string]: TResult[] } {
-    const initialValue: { [key: string]: TResult[] } = {};
-    return this.Aggregate((ac, v) => {
+  public GroupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): { [key: string]: TResult[] } {
+    const initialValue: TResult[] = [];
+    const func = function (ac: GroupType<TOut>[], v: T) {
       const key = grouper(v);
-      const existingGroup = ac[key];
+      const existingGroup = new List<GroupType<TOut>>(ac).FirstOrDefault(x => Tools.equal(x.key, key));
       const mappedValue = mapper(v);
-      existingGroup ? existingGroup.push(mappedValue) : (ac[key] = [mappedValue]);
+
+      if (existingGroup) {
+        existingGroup.elements.push(mappedValue);
+        existingGroup.count++;
+      } else {
+        const existingMap = { key: key, count: 1, elements: [mappedValue] };
+        ac.push(existingMap);
+      }
       return ac;
-    }, initialValue);
+    };
+    return this.Aggregate(func, initialValue);
   }
 
   /**
