@@ -1,4 +1,4 @@
-# LinQ for TypeScript
+# Linq for TypeScript
 
 [![Build](https://github.com/kutyel/linq.ts/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/kutyel/linq.ts/actions/workflows/main.yml)
 [![Coverage Status](https://coveralls.io/repos/github/kutyel/linq.ts/badge.svg?branch=master)](https://coveralls.io/github/kutyel/linq.ts?branch=master)
@@ -23,11 +23,12 @@ const arr = new List<number>([1, 2, 3, 4, 5])
   .Select(y => y * 2)
   .ToArray(); // > [8, 10]
 
-const query = people.Join(pets,
+const query = people.Join(
+  pets,
   person => person,
   pet => pet.Owner,
-  (person, pet) =>
-    ({ OwnerName: person.Name, Pet: pet.Name }));
+  (person, pet) => ({ OwnerName: person.Name, Pet: pet.Name })
+);
 ```
 
 ## Demo
