@@ -1,4 +1,4 @@
-import Linq from '../linq';
+import Linq from '../src/linq';
 
 interface GroupObj {
   id: number;

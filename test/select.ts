@@ -1,5 +1,5 @@
 // jslinq = require('../linqjs/linq');
-import Linq from '../linq';
+import Linq from '../src/linq';
 
 const parameters = [
   {

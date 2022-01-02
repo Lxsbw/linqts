@@ -1,6 +1,6 @@
 let numbers, reaultA, reaultB, reaultC;
 
-import Linq from '../linq';
+import Linq from '../src/linq';
 
 numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 

@@ -1,6 +1,6 @@
 let numbers, parameters, result;
 
-import Linq from '../linq';
+import Linq from '../src/linq';
 interface Person {
   ID: number;
   Name: string;

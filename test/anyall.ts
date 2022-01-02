@@ -1,6 +1,6 @@
 let dataA, dataA_D, dataB, dataB_D, dataC, dataC_D;
 
-import Linq from '../linq';
+import Linq from '../src/linq';
 
 dataA = [0, 1, 3, 3, 2];
 dataB = [1.5, 1.5, 1.5, 1.5];
