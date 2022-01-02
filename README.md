@@ -66,6 +66,7 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
     <td align="center"><a href="https://github.com/mrsauravsahu"><img src="https://avatars.githubusercontent.com/u/9134050?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Saurav Sahu</b></sub></a><br /><a href="#infra-mrsauravsahu" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     <td align="center"><a href="https://github.com/typescriptbob"><img src="https://avatars.githubusercontent.com/u/57693517?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Bob Cook</b></sub></a><br /><a href="#financial-typescriptbob" title="Financial">💵</a></td>
     <td align="center"><a href="http://www.adrienrichard.com/"><img src="https://avatars.githubusercontent.com/u/25491408?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Adrien</b></sub></a><br /><a href="https://github.com/kutyel/linq.ts/commits?author=Mrgove10" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Lxsbw/"><img src="https://avatars.githubusercontent.com/u/34436976?v=4" width="100px;" alt=""/><br /><sub><b>Lxsbw</b></sub></a><br /><a href="https://github.com/Lxsbw/linqts/commits?author=Lxsbw" title="Code">💻</a></td>
   </tr>
 </table>
 
