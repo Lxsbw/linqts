@@ -1,11 +1,12 @@
 # Linq for TypeScript
 
-[![Build](https://github.com/kutyel/linq.ts/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/kutyel/linq.ts/actions/workflows/main.yml)
-[![Coverage Status](https://coveralls.io/repos/github/kutyel/linq.ts/badge.svg?branch=master)](https://coveralls.io/github/kutyel/linq.ts?branch=master)
-[![Downloads](https://img.shields.io/npm/dm/linqts.svg)](https://npmjs.com/package/linqts)
-[![Version](https://img.shields.io/npm/v/linqts.svg)](https://npmjs.com/package/linqts)
-[![Sponsors](https://img.shields.io/github/sponsors/kutyel)](https://github.com/sponsors/kutyel)
-[![linqts](https://raw.githubusercontent.com/kutyel/linq/master/linqts.png)](http://www.typescriptlang.org)
+[![linqts](https://raw.githubusercontent.com/Lxsbw/linqts/master/linqts.png)](http://www.typescriptlang.org)
+
+## From
+
+https://github.com/kutyel/linq.ts
+
+Thank you
 
 ## Install
 
@@ -31,21 +32,9 @@ const query = people.Join(
 );
 ```
 
-## Demo
-
-![linqts.gif](https://raw.githubusercontent.com/kutyel/linq/master/linqts.gif)
-
 ## Documentation
 
-If you do not know LinQ or just want to remember what is all about, have a look at the [docs](http://kutyel.github.io/linq.ts/docs/classes/list/index.html).
-
-## Tests
-
-```sh
-$ npm t
-```
-
-Powered by [AVA](https://github.com/sindresorhus/ava).
+If you do not know Linq or just want to remember what is all about, have a look at the [docs](http://kutyel.github.io/linq.ts/docs/classes/list/index.html).
 
 ## Contributors
 
@@ -80,13 +69,8 @@ Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds
   </tr>
 </table>
 
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
 This project follows the [all-contributors](https://github.com/kentcdodds/all-contributors) specification. Contributions of any kind welcome!
 
 ## License
 
-MIT © [Flavio Corpa](http://flaviocorpa.com)
+MIT

@@ -11,24 +11,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kutyel/linq.ts.git"
+    "url": "https://github.com/Lxsbw/linqts.git"
   },
   "keywords": [
     "linq",
     "typescript"
   ],
-  "files": [
-    "dist",
-    "linq.ts",
-    "README.md"
-  ],
   "author": {
-    "name": "Flavio Corpa",
-    "email": "flaviocorpa@gmail.com",
-    "url": "https://github.com/kutyel"
+    "name": "lxsbw",
+    "email": "lxsbw@outlook.com",
+    "url": "https://github.com/Lxsbw"
   },
   "license": "MIT",
-  "homepage": "https://github.com/kutyel/linq.ts#readme",
+  "homepage": "https://github.com/Lxsbw/linqts#README",
   "dependencies": {},
   "devDependencies": {}
 }
