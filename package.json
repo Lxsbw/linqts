@@ -6,6 +6,9 @@
   "source": "index.ts",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
   "scripts": {
     "build": "tsc"
   },
