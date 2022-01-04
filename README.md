@@ -19,8 +19,6 @@ npm install @lxsbw/linqts --save
 ```typescript
 import { Linq } from '@lxsbw/linqts';
 
-let orderByID, persons, thenByAge, thenByName;
-
 interface Person {
   ID: number;
   Age: number;
@@ -37,14 +35,7 @@ persons = [
   { ID: 2, Age: 15, Name: 'F' }
 ];
 
-orderByID = new Linq<Person>(persons).OrderByDescending(x => x.ID).ToArray();
-
-thenByAge = new Linq<Person>(persons)
-  .OrderByDescending(x => x.ID)
-  .ThenBy(x => x.Age)
-  .ToArray();
-
-thenByName = new Linq<Person>(persons)
+const rst = new Linq<Person>(persons)
   .OrderByDescending(x => x.ID)
   .ThenBy(x => x.Age)
   .ThenByDescending(x => x.Name)
