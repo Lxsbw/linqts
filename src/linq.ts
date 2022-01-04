@@ -151,7 +151,7 @@ class Linq<T> {
     if (index < this.Count() && index >= 0) {
       return this._elements[index];
     } else {
-      throw new Error('ArgumentOutOfRangeException: index is less than 0 or greater than or Tools.equal to the number of elements in source.');
+      throw new Error('ArgumentOutOfRangeException: index is less than 0 or greater than or equal to the number of elements in source.');
     }
   }
 
@@ -405,7 +405,7 @@ class Linq<T> {
   }
 
   /**
-   * Determines whether two sequences are Tools.equal by comparing the elements by using the default equality comparer for their type.
+   * Determines whether two sequences are equal by comparing the elements by using the default equality comparer for their type.
    */
   public SequenceEqual(list: Linq<T>): boolean {
     return this.All(e => list.Contains(e));
@@ -579,7 +579,13 @@ class Tools {
   /**
    * Determine if two objects are equal
    */
-  static equal = <T, U>(a: T, b: U): boolean => Object.entries(a).every(([key, val]) => (Tools.isObj(val) ? Tools.equal(b[key], val) : b[key] === val));
+  static equal = <T, U>(a: T | any, b: U | any) => {
+    if (a === b) return true;
+    if (typeof a != typeof b) return false;
+    if (!(a instanceof Object)) return a === b;
+    // Cannot compare simple types
+    Object.entries(a).every(([key, val]) => (Tools.isObj(val) ? Tools.equal(b[key], val) : b[key] === val));
+  };
 
   /**
    * Creates a function that negates the result of the predicate
@@ -615,42 +621,41 @@ class Tools {
    * clone
    */
   static cloneDeep = <T>(obj: T) => {
-    let copy, k, o, v;
+    let result;
+    // Handle the 3 simple types, and null or undefined
     if (null === obj || 'object' !== typeof obj) {
-      // Handle the 3 simple types, and null or undefined
       return obj;
     }
     // Handle Date
     if (obj instanceof Date) {
-      copy = new Date();
-      copy.setTime(obj.getTime());
-      return copy;
+      result = new Date();
+      result.setTime(obj.getTime());
+      return result;
+    }
+    // Handle RegExp
+    if (obj instanceof RegExp) {
+      result = obj;
+      return result;
     }
     // Handle Array
     if (obj instanceof Array) {
-      copy = function () {
-        let j, len, results;
-        results = [];
-        for (j = 0, len = obj.length; j < len; j++) {
-          o = obj[j];
-          results.push(Tools.cloneDeep(o));
-        }
-        return results;
-      }.call(this);
-      return copy;
+      result = [];
+      for (let i in obj) {
+        result.push(Tools.cloneDeep(obj[i]));
+      }
+      return result;
     }
     // Handle Object
     if (obj instanceof Object) {
-      copy = {};
-      for (k in obj) {
-        v = obj[k];
-        if (obj.hasOwnProperty(k)) {
-          copy[k] = Tools.cloneDeep(v);
+      result = {};
+      for (let i in obj) {
+        if (obj.hasOwnProperty(i)) {
+          result[i] = Tools.cloneDeep(obj[i]);
         }
       }
-      return copy;
+      return result;
     }
-    throw new Error("Unable to copy obj! Its type isn't supported.");
+    throw new Error("Unable to copy param! Its type isn't supported.");
   };
 }
 
