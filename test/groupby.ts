@@ -28,6 +28,7 @@ let result = new Linq(data).GroupBy(el => el.category);
 // 去重
 // let result = new Linq(data).DistinctBy(x => x.category).ToArray();
 // let result = new Linq(data)
+//   .OrderBy(x => x.countries)
 //   .DistinctBy(el => {
 //     return { id: el.id, category: el.category };
 //   })

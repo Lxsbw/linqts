@@ -1,4 +1,4 @@
-let numbers, reaultA, reaultB, reaultC;
+let numbers, reaultA, reaultB, reaultC, reaultD;
 
 import Linq from '../src/linq';
 
@@ -12,12 +12,12 @@ reaultB = new Linq<number>(numbers).Any(function (value) {
   return value >= 10;
 });
 
-reaultC = new Linq<number>(numbers).Any(function (value) {
-  return value < 5;
-});
+reaultC = new Linq<number>(numbers).Any(x => x < 5);
+// reaultD = new Linq<number>(numbers).All(x => x < 5);
 
 console.log('reaultA:', reaultA);
-
 console.log('reaultB:', reaultB);
-
 console.log('reaultC:', reaultC);
+console.log('reaultD:', reaultD);
+
+// deno run ./test/any.ts

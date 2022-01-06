@@ -584,7 +584,7 @@ class Tools {
     if (typeof a != typeof b) return false;
     if (!(a instanceof Object)) return a === b;
     // Cannot compare simple types
-    Object.entries(a).every(([key, val]) => (Tools.isObj(val) ? Tools.equal(b[key], val) : b[key] === val));
+    return Object.entries(a).every(([key, val]) => (Tools.isObj(val) ? Tools.equal(b[key], val) : b[key] === val));
   };
 
   /**

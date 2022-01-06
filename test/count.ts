@@ -29,12 +29,8 @@ let parameters2: Bill[] = [
 
 intCount = new Linq<number>(intArray).Count();
 stringCount = new Linq(stringList).Count();
-intCount2 = new Linq<number>(intArray).Count(function (value) {
-  return value % 2 === 0;
-});
-stringCount2 = new Linq<string>(stringList).Count(function (value) {
-  return value.indexOf('三') >= 0;
-});
+intCount2 = new Linq<number>(intArray).Count(x => x % 2 === 0);
+stringCount2 = new Linq<string>(stringList).Count(x => x.indexOf('三') >= 0);
 
 const Qty = new Linq(parameters).Count(x => x.sn && x.sn.length > 0);
 const noQty = new Linq(parameters).Where(x => !x.sn);
