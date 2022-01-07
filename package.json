@@ -1,5 +1,5 @@
 {
-  "name": "linq_ts",
+  "name": "linq-to-ts",
   "version": "1.0.0",
   "description": "Linq + TypeScript",
   "es2015": "index.ts",

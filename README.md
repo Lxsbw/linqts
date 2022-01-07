@@ -11,14 +11,14 @@ Thank you
 ## Install
 
 ```sh
-npm install @lxsbw/linqts --save
+npm install linq-to-ts --save
 ```
 
 ## Usage
 
 ### import
 ```typescript
-import { Linq } from '@lxsbw/linqts';
+import { Linq } from 'linq-to-ts';
 ```
 
 ### 1. All
