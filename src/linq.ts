@@ -1,8 +1,8 @@
 type PredicateType<T> = (value?: T, index?: number, list?: T[]) => boolean;
 interface GroupType<T> {
-  key?: T;
+  key?: any;
   count?: number;
-  elements?: any;
+  elements?: T[];
 }
 
 /**
@@ -206,9 +206,9 @@ class Linq<T> {
    */
   public GroupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): { [key: string]: TResult[] } {
     const initialValue: TResult[] = [];
-    const func = function (ac: GroupType<TOut>[], v: T) {
+    const func = function (ac: GroupType<TResult>[], v: T) {
       const key = grouper(v);
-      const existingGroup = new Linq<GroupType<TOut>>(ac).FirstOrDefault(x => Tools.equal(x.key, key));
+      const existingGroup = new Linq<GroupType<TResult>>(ac).FirstOrDefault(x => Tools.equal(x.key, key));
       const mappedValue = mapper(v);
 
       if (existingGroup) {
