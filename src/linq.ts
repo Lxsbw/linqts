@@ -5,6 +5,9 @@ interface GroupType<T> {
   elements?: any;
 }
 
+/**
+ * LINQ to TypeScript (Language Integrated Query)
+ */
 class Linq<T> {
   protected _elements: T[];
 
@@ -570,6 +573,9 @@ class OrderedList<T> extends Linq<T> {
   }
 }
 
+/**
+ * Tool method
+ */
 class Tools {
   /**
    * Checks if the argument passed is an object
@@ -603,6 +609,9 @@ class Tools {
     (a: T, b: T) =>
       previousComparer(a, b) || currentComparer(a, b);
 
+  /**
+   * Key comparer
+   */
   static keyComparer =
     <T>(_keySelector: (key: T) => string, descending?: boolean): ((a: T, b: T) => number) =>
     (a: T, b: T) => {
@@ -618,7 +627,7 @@ class Tools {
     };
 
   /**
-   * clone
+   * Clone data
    */
   static cloneDeep = <T>(obj: T) => {
     let result;
