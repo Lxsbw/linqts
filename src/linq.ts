@@ -461,7 +461,7 @@ class Linq<T> {
   public Sum(): number;
   public Sum(transform: (value?: T, index?: number, list?: T[]) => number): number;
   public Sum(transform?: (value?: T, index?: number, list?: T[]) => number): number {
-    return transform ? this.Select(transform).Sum() : this.Aggregate((ac, v) => (ac += +v), 0);
+    return transform ? this.Select(transform).Sum() : this.Aggregate((ac, v) => (ac = Tools.calcNum(ac, +v)), 0);
   }
 
   /**
@@ -625,6 +625,11 @@ class Tools {
         return 0;
       }
     };
+
+  /**
+   * Number calculate
+   */
+  static calcNum = (num, val) => (num + val).toFixed(8) - 0;
 
   /**
    * Clone data
