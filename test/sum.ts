@@ -12,7 +12,7 @@ let parameters = [
 ];
 
 let numbers = [
-  { Age: 0.1, Name: '正一郎' },
+  { Age: 0, Name: '正一郎' },
   { Age: 0.3, Name: '清次郎' },
   { Age: 0.5, Name: '誠三郎' },
   { Age: 0.8, Name: '征史郎' }
