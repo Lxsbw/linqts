@@ -22,8 +22,10 @@ let ageSum = new Linq<Person>(parameters).Sum(x => x.Age);
 let ageSumByNum = new Linq(numbers).Sum(x => x.Age);
 let ageMax = new Linq<Person>(parameters).Max(x => x.Age);
 let ageMin = new Linq<Person>(parameters).Min(x => x.Age);
+let ageDivByNum = new Linq<Person>(numbers).Average(x => x.Age);
 
 console.log('ageSum:', ageSum);
 console.log('ageSumByNum:', ageSumByNum);
+console.log('ageDivByNum:', ageDivByNum);
 console.log('ageMax:', ageMax);
 console.log('ageMin:', ageMin);
