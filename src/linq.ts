@@ -76,7 +76,7 @@ class Linq<T> {
   public Average(): number;
   public Average(transform: (value?: T, index?: number, list?: T[]) => any): number;
   public Average(transform?: (value?: T, index?: number, list?: T[]) => any): number {
-    return this.Sum(transform) / this.Count(transform);
+    return Tools.calcNumDiv(this.Sum(transform), this.Count());
   }
 
   /**
@@ -627,14 +627,42 @@ class Tools {
     };
 
   /**
-   * Number calculate
+   * Number calculate addition
    */
-  static calcNum = (num, val) => (num + val).toFixed(8) - 0;
+  static calcNum = (num1: number, num2: number): number => {
+    if (!Tools.isNum(num1) || !Tools.isNum(num2)) return 0;
+    const { mult, place } = Tools.calcMultiple(num1, num2);
+    return Number(((num1 * mult + num2 * mult) / mult).toFixed(place));
+  };
+
+  /**
+   * Number calculate division
+   * To be improved
+   */
+  static calcNumDiv = (num1: number, num2: number): number => num1 / num2;
+
+  /**
+   * Check number
+   */
+  static isNum = (args): boolean => typeof args === 'number' && !isNaN(args);
+
+  /**
+   * Calculation multiple
+   */
+  static calcMultiple = (num1: number, num2: number): any => {
+    const arrNum1 = num1.toString().split('.');
+    const arrNum2 = num2.toString().split('.');
+    const sq1 = arrNum1.length > 1 ? arrNum1[1].length : 0;
+    const sq2 = arrNum2.length > 1 ? arrNum2[1].length : 0;
+    const mult = Math.pow(10, Math.max(sq1, sq2));
+    const place = sq1 >= sq2 ? sq1 : sq2;
+    return { mult, place };
+  };
 
   /**
    * Clone data
    */
-  static cloneDeep = <T>(obj: T) => {
+  static cloneDeep = <T, Y>(obj: T): T | Y => {
     let result;
     // Handle the 3 simple types, and null or undefined
     if (null === obj || 'object' !== typeof obj) {
