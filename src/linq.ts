@@ -621,11 +621,9 @@ class Tools {
   /**
    * Key comparer
    */
-  static keyComparer =
-    <T>(_keySelector: (key: T) => string, descending?: boolean): ((a: T, b: T) => number) =>
-    (a: T, b: T) => {
-      const sortKeyA = _keySelector(a);
-      const sortKeyB = _keySelector(b);
+  static keyComparer = <T>(_keySelector: (key: T) => string, descending?: boolean): ((a: T, b: T) => number) => {
+    // common comparer
+    const _comparer = (sortKeyA, sortKeyB): number => {
       if (sortKeyA > sortKeyB) {
         return !descending ? 1 : -1;
       } else if (sortKeyA < sortKeyB) {
@@ -634,6 +632,28 @@ class Tools {
         return 0;
       }
     };
+
+    // string comparer
+    const _stringComparer = (sortKeyA, sortKeyB): number => {
+      if (sortKeyA.localeCompare(sortKeyB) > 0) {
+        return !descending ? 1 : -1;
+      } else if (sortKeyB.localeCompare(sortKeyA) > 0) {
+        return !descending ? -1 : 1;
+      } else {
+        return 0;
+      }
+    };
+
+    return (a: T, b: T) => {
+      const sortKeyA = _keySelector(a);
+      const sortKeyB = _keySelector(b);
+
+      if (Tools.isString(sortKeyA) && Tools.isString(sortKeyB)) {
+        return _stringComparer(sortKeyA, sortKeyB);
+      }
+      return _comparer(sortKeyA, sortKeyB);
+    };
+  };
 
   /**
    * Number calculate addition
@@ -654,6 +674,11 @@ class Tools {
    * Check number
    */
   static isNum = (args): boolean => typeof args === 'number' && !isNaN(args);
+
+  /**
+   * Check string
+   */
+  static isString = (args): boolean => typeof args === 'string' && args.constructor === String;
 
   /**
    * Calculation multiple
