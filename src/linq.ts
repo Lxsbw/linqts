@@ -511,7 +511,7 @@ class Linq<T> {
       dicc[this.Select(key).ElementAt(i).toString()] = value ? this.Select(value).ElementAt(i) : v;
       dicc.Add({
         Key: this.Select(key).ElementAt(i),
-        Value: value ? this.Select(value).ElementAt(i) : v
+        Value: value ? this.Select(value).ElementAt(i) : v,
       });
       return dicc;
     }, new Linq<{ Key: TKey; Value: T | TValue }>());
