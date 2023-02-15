@@ -1,13 +1,13 @@
 {
   "name": "linq-to-ts",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Linq + TypeScript",
   "es2015": "index.ts",
   "source": "index.ts",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "files": [
-    "dist/*"
+    "dist/src/*"
   ],
   "scripts": {
     "build": "tsc"
