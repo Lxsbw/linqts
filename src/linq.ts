@@ -76,44 +76,44 @@ class Linq<T> {
   public average(): number;
   public average(transform: (value?: T, index?: number, list?: T[]) => any): number;
   public average(transform?: (value?: T, index?: number, list?: T[]) => any): number {
-    return Tools.calcNumDiv(this.Sum(transform), this.Count());
+    return Tools.calcNumDiv(this.Sum(transform), this.count());
   }
 
   /**
    * Casts the elements of a sequence to the specified type.
    */
-  public Cast<U>(): Linq<U> {
+  public cast<U>(): Linq<U> {
     return new Linq<U>(this._elements as any);
   }
 
   /**
    * Removes all elements from the Linq<T>.
    */
-  public Clear(): void {
+  public clear(): void {
     this._elements.length = 0;
   }
 
   /**
    * Concatenates two sequences.
    */
-  public Concat(list: Linq<T>): Linq<T> {
+  public concat(list: Linq<T>): Linq<T> {
     return new Linq<T>(this._elements.concat(list.ToArray()));
   }
 
   /**
    * Determines whether an element is in the Linq<T>.
    */
-  public Contains(element: T): boolean {
+  public contains(element: T): boolean {
     return this.any(x => x === element);
   }
 
   /**
    * Returns the number of elements in a sequence.
    */
-  public Count(): number;
-  public Count(predicate: PredicateType<T>): number;
-  public Count(predicate?: PredicateType<T>): number {
-    return predicate ? this.Where(predicate).Count() : this._elements.length;
+  public count(): number;
+  public count(predicate: PredicateType<T>): number;
+  public count(predicate?: PredicateType<T>): number {
+    return predicate ? this.Where(predicate).count() : this._elements.length;
   }
 
   /**
@@ -121,7 +121,7 @@ class Linq<T> {
    * in a singleton collection if the sequence is empty.
    */
   public DefaultIfEmpty(defaultValue?: T): Linq<T> {
-    return this.Count() ? this : new Linq<T>([defaultValue]);
+    return this.count() ? this : new Linq<T>([defaultValue]);
   }
 
   /**
@@ -160,7 +160,7 @@ class Linq<T> {
    * Returns the element at a specified index in a sequence.
    */
   public ElementAt(index: number): T {
-    if (index < this.Count() && index >= 0) {
+    if (index < this.count() && index >= 0) {
       return this._elements[index];
     } else {
       throw new Error('ArgumentOutOfRangeException: index is less than 0 or greater than or equal to the number of elements in source.');
@@ -171,14 +171,14 @@ class Linq<T> {
    * Returns the element at a specified index in a sequence or a default value if the index is out of range.
    */
   public ElementAtOrDefault(index: number): T | null {
-    return index < this.Count() && index >= 0 ? this._elements[index] : undefined;
+    return index < this.count() && index >= 0 ? this._elements[index] : undefined;
   }
 
   /**
    * Produces the set difference of two sequences by using the default equality comparer to compare values.
    */
   public Except(source: Linq<T>): Linq<T> {
-    return this.Where(x => !source.Contains(x));
+    return this.Where(x => !source.contains(x));
   }
 
   /**
@@ -187,7 +187,7 @@ class Linq<T> {
   public First(): T;
   public First(predicate: PredicateType<T>): T;
   public First(predicate?: PredicateType<T>): T {
-    if (this.Count()) {
+    if (this.count()) {
       return predicate ? this.Where(predicate).First() : this._elements[0];
     } else {
       throw new Error('InvalidOperationException: The source sequence is empty.');
@@ -200,7 +200,7 @@ class Linq<T> {
   public FirstOrDefault(): T;
   public FirstOrDefault(predicate: PredicateType<T>): T;
   public FirstOrDefault(predicate?: PredicateType<T>): T {
-    return this.Count(predicate) ? this.First(predicate) : undefined;
+    return this.count(predicate) ? this.First(predicate) : undefined;
   }
 
   /**
@@ -267,7 +267,7 @@ class Linq<T> {
    * Produces the set intersection of two sequences by using the default equality comparer to compare values.
    */
   public Intersect(source: Linq<T>): Linq<T> {
-    return this.Where(x => source.Contains(x));
+    return this.Where(x => source.contains(x));
   }
 
   /**
@@ -283,8 +283,8 @@ class Linq<T> {
   public Last(): T;
   public Last(predicate: PredicateType<T>): T;
   public Last(predicate?: PredicateType<T>): T {
-    if (this.Count()) {
-      return predicate ? this.Where(predicate).Last() : this._elements[this.Count() - 1];
+    if (this.count()) {
+      return predicate ? this.Where(predicate).Last() : this._elements[this.count() - 1];
     } else {
       throw Error('InvalidOperationException: The source sequence is empty.');
     }
@@ -296,7 +296,7 @@ class Linq<T> {
   public LastOrDefault(): T;
   public LastOrDefault(predicate: PredicateType<T>): T;
   public LastOrDefault(predicate?: PredicateType<T>): T {
-    return this.Count(predicate) ? this.Last(predicate) : undefined;
+    return this.count(predicate) ? this.Last(predicate) : undefined;
   }
 
   /**
@@ -341,7 +341,7 @@ class Linq<T> {
         typeName = null;
         break;
     }
-    return typeName === null ? this.Where(x => x instanceof type).Cast<U>() : this.Where(x => typeof x === typeName).Cast<U>();
+    return typeName === null ? this.Where(x => x instanceof type).cast<U>() : this.Where(x => typeof x === typeName).cast<U>();
   }
 
   /**
@@ -420,14 +420,14 @@ class Linq<T> {
    * Determines whether two sequences are equal by comparing the elements by using the default equality comparer for their type.
    */
   public SequenceEqual(list: Linq<T>): boolean {
-    return this.all(e => list.Contains(e));
+    return this.all(e => list.contains(e));
   }
 
   /**
    * Returns the only element of a sequence, and throws an exception if there is not exactly one element in the sequence.
    */
   public Single(predicate?: PredicateType<T>): T {
-    if (this.Count(predicate) !== 1) {
+    if (this.count(predicate) !== 1) {
       throw new Error('The collection does not contain exactly one element.');
     } else {
       return this.First(predicate);
@@ -439,7 +439,7 @@ class Linq<T> {
    * this method throws an exception if there is more than one element in the sequence.
    */
   public SingleOrDefault(predicate?: PredicateType<T>): T {
-    return this.Count(predicate) ? this.Single(predicate) : undefined;
+    return this.count(predicate) ? this.Single(predicate) : undefined;
   }
 
   /**
@@ -535,7 +535,7 @@ class Linq<T> {
    * Produces the set union of two sequences by using the default equality comparer.
    */
   public Union(list: Linq<T>): Linq<T> {
-    return this.Concat(list).Distinct();
+    return this.concat(list).Distinct();
   }
 
   /**
@@ -549,7 +549,7 @@ class Linq<T> {
    * Applies a specified function to the corresponding elements of two sequences, producing a sequence of the results.
    */
   public Zip<U, TOut>(list: Linq<U>, result: (first: T, second: U) => TOut): Linq<TOut> {
-    return list.Count() < this.Count() ? list.Select((x, y) => result(this.ElementAt(y), x)) : this.Select((x, y) => result(x, list.ElementAt(y)));
+    return list.count() < this.count() ? list.Select((x, y) => result(this.ElementAt(y), x)) : this.Select((x, y) => result(x, list.ElementAt(y)));
   }
 }
 
