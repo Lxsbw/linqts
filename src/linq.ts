@@ -120,24 +120,24 @@ class Linq<T> {
    * Returns the elements of the specified sequence or the type parameter's default value
    * in a singleton collection if the sequence is empty.
    */
-  public DefaultIfEmpty(defaultValue?: T): Linq<T> {
+  public defaultIfEmpty(defaultValue?: T): Linq<T> {
     return this.count() ? this : new Linq<T>([defaultValue]);
   }
 
   /**
    * Returns distinct elements from a sequence by using the default equality comparer to compare values.
    */
-  public Distinct(): Linq<T> {
+  public distinct(): Linq<T> {
     return this.Where((value, index, iter) => (Tools.isObj(value) ? iter.findIndex(obj => Tools.equal(obj, value)) : iter.indexOf(value)) === index);
   }
 
   /**
    * Returns distinct elements from a sequence according to specified key selector.
    */
-  public DistinctBy<TOut>(keySelector: (key: T) => TOut): Linq<T> {
+  public distinctBy<TOut>(keySelector: (key: T) => TOut): Linq<T> {
     const groups: any = this.GroupBy(keySelector);
     const func = function (res: Linq<T>, key: T) {
-      const curr = new Linq<GroupType<T>>(groups).FirstOrDefault(x => Tools.equal(x.key, key));
+      const curr = new Linq<GroupType<T>>(groups).firstOrDefault(x => Tools.equal(x.key, key));
       res.add(curr.elements[0]);
       return res;
     };
@@ -150,16 +150,16 @@ class Linq<T> {
   /**
    * Returns distinct elements from a sequence by using the default equality comparer to compare values and this.Select method.
    */
-  public DistinctMap<TOut>(): Linq<T | TOut>;
-  public DistinctMap<TOut>(selector: (element: T, index: number) => TOut): Linq<T | TOut>;
-  public DistinctMap<TOut>(selector?: (element: T, index: number) => TOut): Linq<T | TOut> {
-    return selector ? this.Select(selector).Distinct() : this.Distinct();
+  public distinctMap<TOut>(): Linq<T | TOut>;
+  public distinctMap<TOut>(selector: (element: T, index: number) => TOut): Linq<T | TOut>;
+  public distinctMap<TOut>(selector?: (element: T, index: number) => TOut): Linq<T | TOut> {
+    return selector ? this.Select(selector).distinct() : this.distinct();
   }
 
   /**
    * Returns the element at a specified index in a sequence.
    */
-  public ElementAt(index: number): T {
+  public elementAt(index: number): T {
     if (index < this.count() && index >= 0) {
       return this._elements[index];
     } else {
@@ -170,25 +170,25 @@ class Linq<T> {
   /**
    * Returns the element at a specified index in a sequence or a default value if the index is out of range.
    */
-  public ElementAtOrDefault(index: number): T | null {
+  public elementAtOrDefault(index: number): T | null {
     return index < this.count() && index >= 0 ? this._elements[index] : undefined;
   }
 
   /**
    * Produces the set difference of two sequences by using the default equality comparer to compare values.
    */
-  public Except(source: Linq<T>): Linq<T> {
+  public except(source: Linq<T>): Linq<T> {
     return this.Where(x => !source.contains(x));
   }
 
   /**
    * Returns the first element of a sequence.
    */
-  public First(): T;
-  public First(predicate: PredicateType<T>): T;
-  public First(predicate?: PredicateType<T>): T {
+  public first(): T;
+  public first(predicate: PredicateType<T>): T;
+  public first(predicate?: PredicateType<T>): T {
     if (this.count()) {
-      return predicate ? this.Where(predicate).First() : this._elements[0];
+      return predicate ? this.Where(predicate).first() : this._elements[0];
     } else {
       throw new Error('InvalidOperationException: The source sequence is empty.');
     }
@@ -197,16 +197,16 @@ class Linq<T> {
   /**
    * Returns the first element of a sequence, or a default value if the sequence contains no elements.
    */
-  public FirstOrDefault(): T;
-  public FirstOrDefault(predicate: PredicateType<T>): T;
-  public FirstOrDefault(predicate?: PredicateType<T>): T {
-    return this.count(predicate) ? this.First(predicate) : undefined;
+  public firstOrDefault(): T;
+  public firstOrDefault(predicate: PredicateType<T>): T;
+  public firstOrDefault(predicate?: PredicateType<T>): T {
+    return this.count(predicate) ? this.first(predicate) : undefined;
   }
 
   /**
    * Performs the specified action on each element of the Linq<T>.
    */
-  public ForEach(action: (value?: T, index?: number, list?: T[]) => any): void {
+  public forEach(action: (value?: T, index?: number, list?: T[]) => any): void {
     return this._elements.forEach(action);
   }
 
@@ -217,7 +217,7 @@ class Linq<T> {
     const initialValue: TResult[] = [];
     const func = function (ac: GroupType<TResult>[], v: T) {
       const key = grouper(v);
-      const existingGroup = new Linq<GroupType<TResult>>(ac).FirstOrDefault(x => Tools.equal(x.key, key));
+      const existingGroup = new Linq<GroupType<TResult>>(ac).firstOrDefault(x => Tools.equal(x.key, key));
       const mappedValue = mapper(v);
 
       if (existingGroup) {
@@ -413,7 +413,7 @@ class Linq<T> {
    * Projects each element of a sequence to a List<any> and flattens the resulting sequences into one sequence.
    */
   public SelectMany<TOut extends Linq<any>>(selector: (element: T, index: number) => TOut): TOut {
-    return this.aggregate((ac, _, i) => (ac.addRange(this.Select(selector).ElementAt(i).ToArray()), ac), new Linq<TOut>());
+    return this.aggregate((ac, _, i) => (ac.addRange(this.Select(selector).elementAt(i).ToArray()), ac), new Linq<TOut>());
   }
 
   /**
@@ -430,7 +430,7 @@ class Linq<T> {
     if (this.count(predicate) !== 1) {
       throw new Error('The collection does not contain exactly one element.');
     } else {
-      return this.First(predicate);
+      return this.first(predicate);
     }
   }
 
@@ -460,7 +460,7 @@ class Linq<T> {
    * Bypasses elements in a sequence as long as a specified condition is true and then returns the remaining elements.
    */
   public SkipWhile(predicate: PredicateType<T>): Linq<T> {
-    return this.Skip(this.aggregate(ac => (predicate(this.ElementAt(ac)) ? ++ac : ac), 0));
+    return this.Skip(this.aggregate(ac => (predicate(this.elementAt(ac)) ? ++ac : ac), 0));
   }
 
   /**
@@ -491,7 +491,7 @@ class Linq<T> {
    * Returns elements from a sequence as long as a specified condition is true.
    */
   public TakeWhile(predicate: PredicateType<T>): Linq<T> {
-    return this.Take(this.aggregate(ac => (predicate(this.ElementAt(ac)) ? ++ac : ac), 0));
+    return this.Take(this.aggregate(ac => (predicate(this.elementAt(ac)) ? ++ac : ac), 0));
   }
 
   /**
@@ -508,10 +508,10 @@ class Linq<T> {
   public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }>;
   public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value?: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }> {
     return this.aggregate((dicc, v, i) => {
-      dicc[this.Select(key).ElementAt(i).toString()] = value ? this.Select(value).ElementAt(i) : v;
+      dicc[this.Select(key).elementAt(i).toString()] = value ? this.Select(value).elementAt(i) : v;
       dicc.add({
-        Key: this.Select(key).ElementAt(i),
-        Value: value ? this.Select(value).ElementAt(i) : v,
+        Key: this.Select(key).elementAt(i),
+        Value: value ? this.Select(value).elementAt(i) : v,
       });
       return dicc;
     }, new Linq<{ Key: TKey; Value: T | TValue }>());
@@ -535,7 +535,7 @@ class Linq<T> {
    * Produces the set union of two sequences by using the default equality comparer.
    */
   public Union(list: Linq<T>): Linq<T> {
-    return this.concat(list).Distinct();
+    return this.concat(list).distinct();
   }
 
   /**
@@ -549,7 +549,7 @@ class Linq<T> {
    * Applies a specified function to the corresponding elements of two sequences, producing a sequence of the results.
    */
   public Zip<U, TOut>(list: Linq<U>, result: (first: T, second: U) => TOut): Linq<TOut> {
-    return list.count() < this.count() ? list.Select((x, y) => result(this.ElementAt(y), x)) : this.Select((x, y) => result(x, list.ElementAt(y)));
+    return list.count() < this.count() ? list.Select((x, y) => result(this.elementAt(y), x)) : this.Select((x, y) => result(x, list.elementAt(y)));
   }
 }
 
