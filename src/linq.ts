@@ -135,7 +135,7 @@ class Linq<T> {
    * Returns distinct elements from a sequence according to specified key selector.
    */
   public distinctBy<TOut>(keySelector: (key: T) => TOut): Linq<T> {
-    const groups: any = this.GroupBy(keySelector);
+    const groups: any = this.groupBy(keySelector);
     const func = function (res: Linq<T>, key: T) {
       const curr = new Linq<GroupType<T>>(groups).firstOrDefault(x => Tools.equal(x.key, key));
       res.add(curr.elements[0]);
@@ -213,7 +213,7 @@ class Linq<T> {
   /**
    * Groups the elements of a sequence according to a specified key selector function.
    */
-  public GroupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): { [key: string]: TResult[] } {
+  public groupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): { [key: string]: TResult[] } {
     const initialValue: TResult[] = [];
     const func = function (ac: GroupType<TResult>[], v: T) {
       const key = grouper(v);
@@ -236,7 +236,7 @@ class Linq<T> {
    * Correlates the elements of two sequences based on equality of keys and groups the results.
    * The default equality comparer is used to compare keys.
    */
-  public GroupJoin<U, R>(list: Linq<U>, key1: (k: T) => any, key2: (k: U) => any, result: (first: T, second: Linq<U>) => R): Linq<R> {
+  public groupJoin<U, R>(list: Linq<U>, key1: (k: T) => any, key2: (k: U) => any, result: (first: T, second: Linq<U>) => R): Linq<R> {
     return this.Select(x =>
       result(
         x,
@@ -248,14 +248,14 @@ class Linq<T> {
   /**
    * Returns the index of the first occurence of an element in the List.
    */
-  public IndexOf(element: T): number {
+  public indexOf(element: T): number {
     return this._elements.indexOf(element);
   }
 
   /**
    * Inserts an element into the Linq<T> at the specified index.
    */
-  public Insert(index: number, element: T): void | Error {
+  public insert(index: number, element: T): void | Error {
     if (index < 0 || index > this._elements.length) {
       throw new Error('Index is out of range.');
     }
@@ -266,25 +266,25 @@ class Linq<T> {
   /**
    * Produces the set intersection of two sequences by using the default equality comparer to compare values.
    */
-  public Intersect(source: Linq<T>): Linq<T> {
+  public intersect(source: Linq<T>): Linq<T> {
     return this.Where(x => source.contains(x));
   }
 
   /**
    * Correlates the elements of two sequences based on matching keys. The default equality comparer is used to compare keys.
    */
-  public Join<U, R>(list: Linq<U>, key1: (key: T) => any, key2: (key: U) => any, result: (first: T, second: U) => R): Linq<R> {
+  public join<U, R>(list: Linq<U>, key1: (key: T) => any, key2: (key: U) => any, result: (first: T, second: U) => R): Linq<R> {
     return this.SelectMany(x => list.Where(y => key2(y) === key1(x)).Select(z => result(x, z)));
   }
 
   /**
    * Returns the last element of a sequence.
    */
-  public Last(): T;
-  public Last(predicate: PredicateType<T>): T;
-  public Last(predicate?: PredicateType<T>): T {
+  public last(): T;
+  public last(predicate: PredicateType<T>): T;
+  public last(predicate?: PredicateType<T>): T {
     if (this.count()) {
-      return predicate ? this.Where(predicate).Last() : this._elements[this.count() - 1];
+      return predicate ? this.Where(predicate).last() : this._elements[this.count() - 1];
     } else {
       throw Error('InvalidOperationException: The source sequence is empty.');
     }
@@ -293,18 +293,18 @@ class Linq<T> {
   /**
    * Returns the last element of a sequence, or a default value if the sequence contains no elements.
    */
-  public LastOrDefault(): T;
-  public LastOrDefault(predicate: PredicateType<T>): T;
-  public LastOrDefault(predicate?: PredicateType<T>): T {
-    return this.count(predicate) ? this.Last(predicate) : undefined;
+  public lastOrDefault(): T;
+  public lastOrDefault(predicate: PredicateType<T>): T;
+  public lastOrDefault(predicate?: PredicateType<T>): T {
+    return this.count(predicate) ? this.last(predicate) : undefined;
   }
 
   /**
    * Returns the maximum value in a generic sequence.
    */
-  public Max(): number;
-  public Max(selector: (value: T, index: number, array: T[]) => number): number;
-  public Max(selector?: (value: T, index: number, array: T[]) => number): number {
+  public max(): number;
+  public max(selector: (value: T, index: number, array: T[]) => number): number;
+  public max(selector?: (value: T, index: number, array: T[]) => number): number {
     const id = x => x;
     return Math.max(...this._elements.map(selector || id));
   }
@@ -312,9 +312,9 @@ class Linq<T> {
   /**
    * Returns the minimum value in a generic sequence.
    */
-  public Min(): number;
-  public Min(selector: (value: T, index: number, array: T[]) => number): number;
-  public Min(selector?: (value: T, index: number, array: T[]) => number): number {
+  public min(): number;
+  public min(selector: (value: T, index: number, array: T[]) => number): number;
+  public min(selector?: (value: T, index: number, array: T[]) => number): number {
     const id = x => x;
     return Math.min(...this._elements.map(selector || id));
   }
@@ -378,7 +378,7 @@ class Linq<T> {
    * Removes the first occurrence of a specific object from the Linq<T>.
    */
   public Remove(element: T): boolean {
-    return this.IndexOf(element) !== -1 ? (this.RemoveAt(this.IndexOf(element)), true) : false;
+    return this.indexOf(element) !== -1 ? (this.RemoveAt(this.indexOf(element)), true) : false;
   }
 
   /**
@@ -528,7 +528,7 @@ class Linq<T> {
    * Creates a Lookup<TKey, TElement> from an IEnumerable<T> according to specified key selector and element selector functions.
    */
   public ToLookup<TResult>(keySelector: (key: T) => string | number, elementSelector: (element: T) => TResult): { [key: string]: TResult[] } {
-    return this.GroupBy(keySelector, elementSelector);
+    return this.groupBy(keySelector, elementSelector);
   }
 
   /**
