@@ -21,51 +21,51 @@ class Linq<T> {
   /**
    * Adds an object to the end of the Linq<T>.
    */
-  public Add(element: T): void {
+  public add(element: T): void {
     this._elements.push(element);
   }
 
   /**
    * Appends an object to the end of the Linq<T>.
    */
-  public Append(element: T): void {
-    this.Add(element);
+  public append(element: T): void {
+    this.add(element);
   }
 
   /**
    * Add an object to the start of the Linq<T>.
    */
-  public Prepend(element: T): void {
+  public prepend(element: T): void {
     this._elements.unshift(element);
   }
 
   /**
    * Adds the elements of the specified collection to the end of the Linq<T>.
    */
-  public AddRange(elements: T[]): void {
+  public addRange(elements: T[]): void {
     this._elements.push(...elements);
   }
 
   /**
    * Applies an accumulator function over a sequence.
    */
-  public Aggregate<U>(accumulator: (accum: U, value?: T, index?: number, list?: T[]) => any, initialValue?: U): any {
+  public aggregate<U>(accumulator: (accum: U, value?: T, index?: number, list?: T[]) => any, initialValue?: U): any {
     return this._elements.reduce(accumulator, initialValue);
   }
 
   /**
    * Determines whether all elements of a sequence satisfy a condition.
    */
-  public All(predicate: PredicateType<T>): boolean {
+  public all(predicate: PredicateType<T>): boolean {
     return this._elements.every(predicate);
   }
 
   /**
    * Determines whether a sequence contains any elements.
    */
-  public Any(): boolean;
-  public Any(predicate: PredicateType<T>): boolean;
-  public Any(predicate?: PredicateType<T>): boolean {
+  public any(): boolean;
+  public any(predicate: PredicateType<T>): boolean;
+  public any(predicate?: PredicateType<T>): boolean {
     return predicate ? this._elements.some(predicate) : this._elements.length > 0;
   }
 
@@ -73,9 +73,9 @@ class Linq<T> {
    * Computes the average of a sequence of number values that are obtained by invoking
    * a transform function on each element of the input sequence.
    */
-  public Average(): number;
-  public Average(transform: (value?: T, index?: number, list?: T[]) => any): number;
-  public Average(transform?: (value?: T, index?: number, list?: T[]) => any): number {
+  public average(): number;
+  public average(transform: (value?: T, index?: number, list?: T[]) => any): number;
+  public average(transform?: (value?: T, index?: number, list?: T[]) => any): number {
     return Tools.calcNumDiv(this.Sum(transform), this.Count());
   }
 
@@ -104,7 +104,7 @@ class Linq<T> {
    * Determines whether an element is in the Linq<T>.
    */
   public Contains(element: T): boolean {
-    return this.Any(x => x === element);
+    return this.any(x => x === element);
   }
 
   /**
@@ -138,7 +138,7 @@ class Linq<T> {
     const groups: any = this.GroupBy(keySelector);
     const func = function (res: Linq<T>, key: T) {
       const curr = new Linq<GroupType<T>>(groups).FirstOrDefault(x => Tools.equal(x.key, key));
-      res.Add(curr.elements[0]);
+      res.add(curr.elements[0]);
       return res;
     };
     return new Linq<GroupType<T>>(groups)
@@ -229,7 +229,7 @@ class Linq<T> {
       }
       return ac;
     };
-    return this.Aggregate(func, initialValue);
+    return this.aggregate(func, initialValue);
   }
 
   /**
@@ -413,14 +413,14 @@ class Linq<T> {
    * Projects each element of a sequence to a List<any> and flattens the resulting sequences into one sequence.
    */
   public SelectMany<TOut extends Linq<any>>(selector: (element: T, index: number) => TOut): TOut {
-    return this.Aggregate((ac, _, i) => (ac.AddRange(this.Select(selector).ElementAt(i).ToArray()), ac), new Linq<TOut>());
+    return this.aggregate((ac, _, i) => (ac.addRange(this.Select(selector).ElementAt(i).ToArray()), ac), new Linq<TOut>());
   }
 
   /**
    * Determines whether two sequences are equal by comparing the elements by using the default equality comparer for their type.
    */
   public SequenceEqual(list: Linq<T>): boolean {
-    return this.All(e => list.Contains(e));
+    return this.all(e => list.Contains(e));
   }
 
   /**
@@ -460,7 +460,7 @@ class Linq<T> {
    * Bypasses elements in a sequence as long as a specified condition is true and then returns the remaining elements.
    */
   public SkipWhile(predicate: PredicateType<T>): Linq<T> {
-    return this.Skip(this.Aggregate(ac => (predicate(this.ElementAt(ac)) ? ++ac : ac), 0));
+    return this.Skip(this.aggregate(ac => (predicate(this.ElementAt(ac)) ? ++ac : ac), 0));
   }
 
   /**
@@ -470,7 +470,7 @@ class Linq<T> {
   public Sum(): number;
   public Sum(transform: (value?: T, index?: number, list?: T[]) => number): number;
   public Sum(transform?: (value?: T, index?: number, list?: T[]) => number): number {
-    return transform ? this.Select(transform).Sum() : this.Aggregate((ac, v) => (ac = Tools.calcNum(ac, +v)), 0);
+    return transform ? this.Select(transform).Sum() : this.aggregate((ac, v) => (ac = Tools.calcNum(ac, +v)), 0);
   }
 
   /**
@@ -491,7 +491,7 @@ class Linq<T> {
    * Returns elements from a sequence as long as a specified condition is true.
    */
   public TakeWhile(predicate: PredicateType<T>): Linq<T> {
-    return this.Take(this.Aggregate(ac => (predicate(this.ElementAt(ac)) ? ++ac : ac), 0));
+    return this.Take(this.aggregate(ac => (predicate(this.ElementAt(ac)) ? ++ac : ac), 0));
   }
 
   /**
@@ -507,9 +507,9 @@ class Linq<T> {
   public ToDictionary<TKey>(key: (key: T) => TKey): Linq<{ Key: TKey; Value: T }>;
   public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }>;
   public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value?: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }> {
-    return this.Aggregate((dicc, v, i) => {
+    return this.aggregate((dicc, v, i) => {
       dicc[this.Select(key).ElementAt(i).toString()] = value ? this.Select(value).ElementAt(i) : v;
-      dicc.Add({
+      dicc.add({
         Key: this.Select(key).ElementAt(i),
         Value: value ? this.Select(value).ElementAt(i) : v,
       });
