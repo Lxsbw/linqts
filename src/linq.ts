@@ -113,7 +113,7 @@ class Linq<T> {
   public count(): number;
   public count(predicate: PredicateType<T>): number;
   public count(predicate?: PredicateType<T>): number {
-    return predicate ? this.Where(predicate).count() : this._elements.length;
+    return predicate ? this.where(predicate).count() : this._elements.length;
   }
 
   /**
@@ -128,7 +128,7 @@ class Linq<T> {
    * Returns distinct elements from a sequence by using the default equality comparer to compare values.
    */
   public distinct(): Linq<T> {
-    return this.Where((value, index, iter) => (Tools.isObj(value) ? iter.findIndex(obj => Tools.equal(obj, value)) : iter.indexOf(value)) === index);
+    return this.where((value, index, iter) => (Tools.isObj(value) ? iter.findIndex(obj => Tools.equal(obj, value)) : iter.indexOf(value)) === index);
   }
 
   /**
@@ -178,7 +178,7 @@ class Linq<T> {
    * Produces the set difference of two sequences by using the default equality comparer to compare values.
    */
   public except(source: Linq<T>): Linq<T> {
-    return this.Where(x => !source.contains(x));
+    return this.where(x => !source.contains(x));
   }
 
   /**
@@ -188,7 +188,7 @@ class Linq<T> {
   public first(predicate: PredicateType<T>): T;
   public first(predicate?: PredicateType<T>): T {
     if (this.count()) {
-      return predicate ? this.Where(predicate).first() : this._elements[0];
+      return predicate ? this.where(predicate).first() : this._elements[0];
     } else {
       throw new Error('InvalidOperationException: The source sequence is empty.');
     }
@@ -240,7 +240,7 @@ class Linq<T> {
     return this.Select(x =>
       result(
         x,
-        list.Where(z => key1(x) === key2(z))
+        list.where(z => key1(x) === key2(z))
       )
     );
   }
@@ -267,14 +267,14 @@ class Linq<T> {
    * Produces the set intersection of two sequences by using the default equality comparer to compare values.
    */
   public intersect(source: Linq<T>): Linq<T> {
-    return this.Where(x => source.contains(x));
+    return this.where(x => source.contains(x));
   }
 
   /**
    * Correlates the elements of two sequences based on matching keys. The default equality comparer is used to compare keys.
    */
   public join<U, R>(list: Linq<U>, key1: (key: T) => any, key2: (key: U) => any, result: (first: T, second: U) => R): Linq<R> {
-    return this.SelectMany(x => list.Where(y => key2(y) === key1(x)).Select(z => result(x, z)));
+    return this.SelectMany(x => list.where(y => key2(y) === key1(x)).Select(z => result(x, z)));
   }
 
   /**
@@ -284,7 +284,7 @@ class Linq<T> {
   public last(predicate: PredicateType<T>): T;
   public last(predicate?: PredicateType<T>): T {
     if (this.count()) {
-      return predicate ? this.Where(predicate).last() : this._elements[this.count() - 1];
+      return predicate ? this.where(predicate).last() : this._elements[this.count() - 1];
     } else {
       throw Error('InvalidOperationException: The source sequence is empty.');
     }
@@ -322,7 +322,7 @@ class Linq<T> {
   /**
    * Filters the elements of a sequence based on a specified type.
    */
-  public OfType<U>(type: any): Linq<U> {
+  public ofType<U>(type: any): Linq<U> {
     let typeName;
     switch (type) {
       case Number:
@@ -341,13 +341,13 @@ class Linq<T> {
         typeName = null;
         break;
     }
-    return typeName === null ? this.Where(x => x instanceof type).cast<U>() : this.Where(x => typeof x === typeName).cast<U>();
+    return typeName === null ? this.where(x => x instanceof type).cast<U>() : this.where(x => typeof x === typeName).cast<U>();
   }
 
   /**
    * Sorts the elements of a sequence in ascending order according to a key.
    */
-  public OrderBy(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, false)): Linq<T> {
+  public orderBy(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, false)): Linq<T> {
     // tslint:disable-next-line: no-use-before-declare
     return new OrderedList<T>(Tools.cloneDeep(this._elements), comparer);
   }
@@ -355,7 +355,7 @@ class Linq<T> {
   /**
    * Sorts the elements of a sequence in descending order according to a key.
    */
-  public OrderByDescending(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, true)): Linq<T> {
+  public orderByDescending(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, true)): Linq<T> {
     // tslint:disable-next-line: no-use-before-declare
     return new OrderedList<T>(Tools.cloneDeep(this._elements), comparer);
   }
@@ -363,15 +363,15 @@ class Linq<T> {
   /**
    * Performs a subsequent ordering of the elements in a sequence in ascending order according to a key.
    */
-  public ThenBy(keySelector: (key: T) => any): Linq<T> {
-    return this.OrderBy(keySelector);
+  public thenBy(keySelector: (key: T) => any): Linq<T> {
+    return this.orderBy(keySelector);
   }
 
   /**
    * Performs a subsequent ordering of the elements in a sequence in descending order, according to a key.
    */
-  public ThenByDescending(keySelector: (key: T) => any): Linq<T> {
-    return this.OrderByDescending(keySelector);
+  public thenByDescending(keySelector: (key: T) => any): Linq<T> {
+    return this.orderByDescending(keySelector);
   }
 
   /**
@@ -385,7 +385,7 @@ class Linq<T> {
    * Removes all the elements that match the conditions defined by the specified predicate.
    */
   public RemoveAll(predicate: PredicateType<T>): Linq<T> {
-    return this.Where(Tools.negate(predicate));
+    return this.where(Tools.negate(predicate));
   }
 
   /**
@@ -534,21 +534,21 @@ class Linq<T> {
   /**
    * Produces the set union of two sequences by using the default equality comparer.
    */
-  public Union(list: Linq<T>): Linq<T> {
+  public union(list: Linq<T>): Linq<T> {
     return this.concat(list).distinct();
   }
 
   /**
    * Filters a sequence of values based on a predicate.
    */
-  public Where(predicate: PredicateType<T>): Linq<T> {
+  public where(predicate: PredicateType<T>): Linq<T> {
     return new Linq<T>(this._elements.filter(predicate));
   }
 
   /**
    * Applies a specified function to the corresponding elements of two sequences, producing a sequence of the results.
    */
-  public Zip<U, TOut>(list: Linq<U>, result: (first: T, second: U) => TOut): Linq<TOut> {
+  public zip<U, TOut>(list: Linq<U>, result: (first: T, second: U) => TOut): Linq<TOut> {
     return list.count() < this.count() ? list.Select((x, y) => result(this.elementAt(y), x)) : this.Select((x, y) => result(x, list.elementAt(y)));
   }
 }
@@ -569,7 +569,7 @@ class OrderedList<T> extends Linq<T> {
    * Performs a subsequent ordering of the elements in a sequence in ascending order according to a key.
    * @override
    */
-  public ThenBy(keySelector: (key: T) => any): Linq<T> {
+  public thenBy(keySelector: (key: T) => any): Linq<T> {
     return new OrderedList(this._elements, Tools.composeComparers(this._comparer, Tools.keyComparer(keySelector, false)));
   }
 
@@ -577,7 +577,7 @@ class OrderedList<T> extends Linq<T> {
    * Performs a subsequent ordering of the elements in a sequence in descending order, according to a key.
    * @override
    */
-  public ThenByDescending(keySelector: (key: T) => any): Linq<T> {
+  public thenByDescending(keySelector: (key: T) => any): Linq<T> {
     return new OrderedList(this._elements, Tools.composeComparers(this._comparer, Tools.keyComparer(keySelector, true)));
   }
 }
