@@ -142,18 +142,18 @@ class Linq<T> {
       return res;
     };
     return new Linq<GroupType<T>>(groups)
-      .Select(x => x.key)
+      .select(x => x.key)
       .ToArray()
       .reduce(func, new Linq<T>());
   }
 
   /**
-   * Returns distinct elements from a sequence by using the default equality comparer to compare values and this.Select method.
+   * Returns distinct elements from a sequence by using the default equality comparer to compare values and this.select method.
    */
   public distinctMap<TOut>(): Linq<T | TOut>;
   public distinctMap<TOut>(selector: (element: T, index: number) => TOut): Linq<T | TOut>;
   public distinctMap<TOut>(selector?: (element: T, index: number) => TOut): Linq<T | TOut> {
-    return selector ? this.Select(selector).distinct() : this.distinct();
+    return selector ? this.select(selector).distinct() : this.distinct();
   }
 
   /**
@@ -237,7 +237,7 @@ class Linq<T> {
    * The default equality comparer is used to compare keys.
    */
   public groupJoin<U, R>(list: Linq<U>, key1: (k: T) => any, key2: (k: U) => any, result: (first: T, second: Linq<U>) => R): Linq<R> {
-    return this.Select(x =>
+    return this.select(x =>
       result(
         x,
         list.where(z => key1(x) === key2(z))
@@ -274,7 +274,7 @@ class Linq<T> {
    * Correlates the elements of two sequences based on matching keys. The default equality comparer is used to compare keys.
    */
   public join<U, R>(list: Linq<U>, key1: (key: T) => any, key2: (key: U) => any, result: (first: T, second: U) => R): Linq<R> {
-    return this.SelectMany(x => list.where(y => key2(y) === key1(x)).Select(z => result(x, z)));
+    return this.SelectMany(x => list.where(y => key2(y) === key1(x)).select(z => result(x, z)));
   }
 
   /**
@@ -377,35 +377,35 @@ class Linq<T> {
   /**
    * Removes the first occurrence of a specific object from the Linq<T>.
    */
-  public Remove(element: T): boolean {
-    return this.indexOf(element) !== -1 ? (this.RemoveAt(this.indexOf(element)), true) : false;
+  public remove(element: T): boolean {
+    return this.indexOf(element) !== -1 ? (this.removeAt(this.indexOf(element)), true) : false;
   }
 
   /**
    * Removes all the elements that match the conditions defined by the specified predicate.
    */
-  public RemoveAll(predicate: PredicateType<T>): Linq<T> {
+  public removeAll(predicate: PredicateType<T>): Linq<T> {
     return this.where(Tools.negate(predicate));
   }
 
   /**
    * Removes the element at the specified index of the Linq<T>.
    */
-  public RemoveAt(index: number): void {
+  public removeAt(index: number): void {
     this._elements.splice(index, 1);
   }
 
   /**
    * Reverses the order of the elements in the entire Linq<T>.
    */
-  public Reverse(): Linq<T> {
+  public reverse(): Linq<T> {
     return new Linq<T>(this._elements.reverse());
   }
 
   /**
    * Projects each element of a sequence into a new form.
    */
-  public Select<TOut>(selector: (element: T, index: number) => TOut): Linq<TOut> {
+  public select<TOut>(selector: (element: T, index: number) => TOut): Linq<TOut> {
     return new Linq<TOut>(this._elements.map(selector));
   }
 
@@ -413,7 +413,7 @@ class Linq<T> {
    * Projects each element of a sequence to a List<any> and flattens the resulting sequences into one sequence.
    */
   public SelectMany<TOut extends Linq<any>>(selector: (element: T, index: number) => TOut): TOut {
-    return this.aggregate((ac, _, i) => (ac.addRange(this.Select(selector).elementAt(i).ToArray()), ac), new Linq<TOut>());
+    return this.aggregate((ac, _, i) => (ac.addRange(this.select(selector).elementAt(i).ToArray()), ac), new Linq<TOut>());
   }
 
   /**
@@ -470,7 +470,7 @@ class Linq<T> {
   public Sum(): number;
   public Sum(transform: (value?: T, index?: number, list?: T[]) => number): number;
   public Sum(transform?: (value?: T, index?: number, list?: T[]) => number): number {
-    return transform ? this.Select(transform).Sum() : this.aggregate((ac, v) => (ac = Tools.calcNum(ac, +v)), 0);
+    return transform ? this.select(transform).Sum() : this.aggregate((ac, v) => (ac = Tools.calcNum(ac, +v)), 0);
   }
 
   /**
@@ -508,10 +508,10 @@ class Linq<T> {
   public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }>;
   public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value?: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }> {
     return this.aggregate((dicc, v, i) => {
-      dicc[this.Select(key).elementAt(i).toString()] = value ? this.Select(value).elementAt(i) : v;
+      dicc[this.select(key).elementAt(i).toString()] = value ? this.select(value).elementAt(i) : v;
       dicc.add({
-        Key: this.Select(key).elementAt(i),
-        Value: value ? this.Select(value).elementAt(i) : v,
+        Key: this.select(key).elementAt(i),
+        Value: value ? this.select(value).elementAt(i) : v,
       });
       return dicc;
     }, new Linq<{ Key: TKey; Value: T | TValue }>());
@@ -549,7 +549,7 @@ class Linq<T> {
    * Applies a specified function to the corresponding elements of two sequences, producing a sequence of the results.
    */
   public zip<U, TOut>(list: Linq<U>, result: (first: T, second: U) => TOut): Linq<TOut> {
-    return list.count() < this.count() ? list.Select((x, y) => result(this.elementAt(y), x)) : this.Select((x, y) => result(x, list.elementAt(y)));
+    return list.count() < this.count() ? list.select((x, y) => result(this.elementAt(y), x)) : this.select((x, y) => result(x, list.elementAt(y)));
   }
 }
 
