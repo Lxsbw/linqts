@@ -97,7 +97,7 @@ class Linq<T> {
    * Concatenates two sequences.
    */
   public concat(list: Linq<T>): Linq<T> {
-    return new Linq<T>(this._elements.concat(list.ToArray()));
+    return new Linq<T>(this._elements.concat(list.toArray()));
   }
 
   /**
@@ -143,7 +143,7 @@ class Linq<T> {
     };
     return new Linq<GroupType<T>>(groups)
       .select(x => x.key)
-      .ToArray()
+      .toArray()
       .reduce(func, new Linq<T>());
   }
 
@@ -413,7 +413,7 @@ class Linq<T> {
    * Projects each element of a sequence to a List<any> and flattens the resulting sequences into one sequence.
    */
   public selectMany<TOut extends Linq<any>>(selector: (element: T, index: number) => TOut): TOut {
-    return this.aggregate((ac, _, i) => (ac.addRange(this.select(selector).elementAt(i).ToArray()), ac), new Linq<TOut>());
+    return this.aggregate((ac, _, i) => (ac.addRange(this.select(selector).elementAt(i).toArray()), ac), new Linq<TOut>());
   }
 
   /**
@@ -476,37 +476,37 @@ class Linq<T> {
   /**
    * Returns a specified number of contiguous elements from the start of a sequence.
    */
-  public Take(amount: number): Linq<T> {
+  public take(amount: number): Linq<T> {
     return new Linq<T>(this._elements.slice(0, Math.max(0, amount)));
   }
 
   /**
    * Returns a specified number of contiguous elements from the end of a sequence.
    */
-  public TakeLast(amount: number): Linq<T> {
+  public takeLast(amount: number): Linq<T> {
     return new Linq<T>(this._elements.slice(-Math.max(0, amount)));
   }
 
   /**
    * Returns elements from a sequence as long as a specified condition is true.
    */
-  public TakeWhile(predicate: PredicateType<T>): Linq<T> {
-    return this.Take(this.aggregate(ac => (predicate(this.elementAt(ac)) ? ++ac : ac), 0));
+  public takeWhile(predicate: PredicateType<T>): Linq<T> {
+    return this.take(this.aggregate(ac => (predicate(this.elementAt(ac)) ? ++ac : ac), 0));
   }
 
   /**
    * Copies the elements of the Linq<T> to a new array.
    */
-  public ToArray(): T[] {
+  public toArray(): T[] {
     return this._elements;
   }
 
   /**
    * Creates a Dictionary<TKey, TValue> from a Linq<T> according to a specified key selector function.
    */
-  public ToDictionary<TKey>(key: (key: T) => TKey): Linq<{ Key: TKey; Value: T }>;
-  public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }>;
-  public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value?: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }> {
+  public toDictionary<TKey>(key: (key: T) => TKey): Linq<{ Key: TKey; Value: T }>;
+  public toDictionary<TKey, TValue>(key: (key: T) => TKey, value: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }>;
+  public toDictionary<TKey, TValue>(key: (key: T) => TKey, value?: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }> {
     return this.aggregate((dicc, v, i) => {
       dicc[this.select(key).elementAt(i).toString()] = value ? this.select(value).elementAt(i) : v;
       dicc.add({
@@ -520,14 +520,14 @@ class Linq<T> {
   /**
    * Creates a Linq<T> from an Enumerable.Linq<T>.
    */
-  public ToList(): Linq<T> {
+  public toList(): Linq<T> {
     return this;
   }
 
   /**
    * Creates a Lookup<TKey, TElement> from an IEnumerable<T> according to specified key selector and element selector functions.
    */
-  public ToLookup<TResult>(keySelector: (key: T) => string | number, elementSelector: (element: T) => TResult): { [key: string]: TResult[] } {
+  public toLookup<TResult>(keySelector: (key: T) => string | number, elementSelector: (element: T) => TResult): { [key: string]: TResult[] } {
     return this.groupBy(keySelector, elementSelector);
   }
 
@@ -557,7 +557,7 @@ class Linq<T> {
  * Represents a sorted sequence. The methods of this class are implemented by using deferred execution.
  * The immediate return value is an object that stores all the information that is required to perform the action.
  * The query represented by this method is not executed until the object is enumerated either by
- * calling its ToDictionary, ToLookup, ToList or ToArray methods
+ * calling its toDictionary, toLookup, toList or toArray methods
  */
 class OrderedList<T> extends Linq<T> {
   constructor(elements: T[], private _comparer: (a: T, b: T) => number) {
