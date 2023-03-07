@@ -76,7 +76,7 @@ class Linq<T> {
   public average(): number;
   public average(transform: (value?: T, index?: number, list?: T[]) => any): number;
   public average(transform?: (value?: T, index?: number, list?: T[]) => any): number {
-    return Tools.calcNumDiv(this.Sum(transform), this.count());
+    return Tools.calcNumDiv(this.sum(transform), this.count());
   }
 
   /**
@@ -274,7 +274,7 @@ class Linq<T> {
    * Correlates the elements of two sequences based on matching keys. The default equality comparer is used to compare keys.
    */
   public join<U, R>(list: Linq<U>, key1: (key: T) => any, key2: (key: U) => any, result: (first: T, second: U) => R): Linq<R> {
-    return this.SelectMany(x => list.where(y => key2(y) === key1(x)).select(z => result(x, z)));
+    return this.selectMany(x => list.where(y => key2(y) === key1(x)).select(z => result(x, z)));
   }
 
   /**
@@ -412,21 +412,21 @@ class Linq<T> {
   /**
    * Projects each element of a sequence to a List<any> and flattens the resulting sequences into one sequence.
    */
-  public SelectMany<TOut extends Linq<any>>(selector: (element: T, index: number) => TOut): TOut {
+  public selectMany<TOut extends Linq<any>>(selector: (element: T, index: number) => TOut): TOut {
     return this.aggregate((ac, _, i) => (ac.addRange(this.select(selector).elementAt(i).ToArray()), ac), new Linq<TOut>());
   }
 
   /**
    * Determines whether two sequences are equal by comparing the elements by using the default equality comparer for their type.
    */
-  public SequenceEqual(list: Linq<T>): boolean {
+  public sequenceEqual(list: Linq<T>): boolean {
     return this.all(e => list.contains(e));
   }
 
   /**
    * Returns the only element of a sequence, and throws an exception if there is not exactly one element in the sequence.
    */
-  public Single(predicate?: PredicateType<T>): T {
+  public single(predicate?: PredicateType<T>): T {
     if (this.count(predicate) !== 1) {
       throw new Error('The collection does not contain exactly one element.');
     } else {
@@ -438,39 +438,39 @@ class Linq<T> {
    * Returns the only element of a sequence, or a default value if the sequence is empty;
    * this method throws an exception if there is more than one element in the sequence.
    */
-  public SingleOrDefault(predicate?: PredicateType<T>): T {
-    return this.count(predicate) ? this.Single(predicate) : undefined;
+  public singleOrDefault(predicate?: PredicateType<T>): T {
+    return this.count(predicate) ? this.single(predicate) : undefined;
   }
 
   /**
    * Bypasses a specified number of elements in a sequence and then returns the remaining elements.
    */
-  public Skip(amount: number): Linq<T> {
+  public skip(amount: number): Linq<T> {
     return new Linq<T>(this._elements.slice(Math.max(0, amount)));
   }
 
   /**
    * Omit the last specified number of elements in a sequence and then returns the remaining elements.
    */
-  public SkipLast(amount: number): Linq<T> {
+  public skipLast(amount: number): Linq<T> {
     return new Linq<T>(this._elements.slice(0, -Math.max(0, amount)));
   }
 
   /**
    * Bypasses elements in a sequence as long as a specified condition is true and then returns the remaining elements.
    */
-  public SkipWhile(predicate: PredicateType<T>): Linq<T> {
-    return this.Skip(this.aggregate(ac => (predicate(this.elementAt(ac)) ? ++ac : ac), 0));
+  public skipWhile(predicate: PredicateType<T>): Linq<T> {
+    return this.skip(this.aggregate(ac => (predicate(this.elementAt(ac)) ? ++ac : ac), 0));
   }
 
   /**
    * Computes the sum of the sequence of number values that are obtained by invoking
    * a transform function on each element of the input sequence.
    */
-  public Sum(): number;
-  public Sum(transform: (value?: T, index?: number, list?: T[]) => number): number;
-  public Sum(transform?: (value?: T, index?: number, list?: T[]) => number): number {
-    return transform ? this.select(transform).Sum() : this.aggregate((ac, v) => (ac = Tools.calcNum(ac, +v)), 0);
+  public sum(): number;
+  public sum(transform: (value?: T, index?: number, list?: T[]) => number): number;
+  public sum(transform?: (value?: T, index?: number, list?: T[]) => number): number {
+    return transform ? this.select(transform).sum() : this.aggregate((ac, v) => (ac = Tools.calcNum(ac, +v)), 0);
   }
 
   /**
