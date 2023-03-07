@@ -7,15 +7,15 @@ let parameters = [
   { ID: 4, Age: 18, Name: '征史郎' }
 ];
 
-let dictionary = new Linq(parameters).ToDictionary(x => x.ID).ToArray();
+let dictionary = new Linq(parameters).toDictionary(x => x.ID).toArray();
 let dictionary2 = new Linq(parameters)
-  .ToDictionary(x => {
+  .toDictionary(x => {
     return { ID: x.ID, Name: x.Name };
   })
-  .ToArray();
+  .toArray();
 
-// dictionary3  = new jslinq(parameters).ToDictionary \
-//   ((value) -> value.ID, (value) -> value.Name).ToArray()
+// dictionary3  = new jslinq(parameters).toDictionary \
+//   ((value) -> value.ID, (value) -> value.Name).toArray()
 console.log('dictionary:', dictionary);
 
 console.log('dictionary2:', dictionary2);

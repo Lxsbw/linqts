@@ -20,9 +20,9 @@ let parameters = [
 
 // dataC_E = new Linq(parameters).select(x=>x.Name).distinct().toArray();
 
-let boxs = new Linq(parameters).Select(x => x.box).Distinct();
+let boxs = new Linq(parameters).select(x => x.box).distinct();
 
-const res = boxs.Count(x => new Linq(parameters).Where(p => p.box === x).All(p => [30, 40].includes(p.status)));
+const res = boxs.count(x => new Linq(parameters).where(p => p.box === x).all(p => [30, 40].includes(p.status)));
 
-console.log('boxs:', boxs.ToArray());
+console.log('boxs:', boxs.toArray());
 console.log('res:', res);

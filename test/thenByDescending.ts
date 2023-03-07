@@ -18,16 +18,16 @@ persons = [
   { ID: 2, Age: 15, Name: 'F' }
 ];
 
-orderByID = new Linq<Person>(persons).OrderByDescending(x => x.ID).ToArray();
+orderByID = new Linq<Person>(persons).orderByDescending(x => x.ID).toArray();
 thenByAge = new Linq<Person>(persons)
-  .OrderByDescending(x => x.ID)
-  .ThenBy(x => x.Age)
-  .ToArray();
+  .orderByDescending(x => x.ID)
+  .thenBy(x => x.Age)
+  .toArray();
 thenByName = new Linq<Person>(persons)
-  .OrderByDescending(x => x.ID)
-  .ThenBy(x => x.Age)
-  .ThenByDescending(x => x.Name)
-  .ToArray();
+  .orderByDescending(x => x.ID)
+  .thenBy(x => x.Age)
+  .thenByDescending(x => x.Name)
+  .toArray();
 
 console.log('orderByID:', orderByID);
 console.log('thenByAge:', thenByAge);

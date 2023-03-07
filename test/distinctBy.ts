@@ -16,13 +16,13 @@ let data = [
 ];
 
 // 去重
-let result1 = new Linq(data).DistinctBy(x => x.category).ToArray();
+let result1 = new Linq(data).distinctBy(x => x.category).toArray();
 let result2 = new Linq(data)
-  .OrderBy(x => x.countries)
-  .DistinctBy(el => {
+  .orderBy(x => x.countries)
+  .distinctBy(el => {
     return { id: el.id, category: el.category };
   })
-  .ToArray();
+  .toArray();
 
 console.log('result:', result1);
 console.log('result:', result2);

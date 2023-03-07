@@ -13,13 +13,13 @@ let parameters = [
   { ID: 42, Rate: 0.3, Name: '征史郎' }
 ];
 
-dataA_D = new Linq(dataA).Distinct().ToArray();
-dataB_D = new Linq(dataB).Distinct().ToArray();
-dataC_D = new Linq(dataC).Distinct().ToArray();
+dataA_D = new Linq(dataA).distinct().toArray();
+dataB_D = new Linq(dataB).distinct().toArray();
+dataC_D = new Linq(dataC).distinct().toArray();
 dataC_E = new Linq(parameters)
-  .Select(x => x.Name)
-  .Distinct()
-  .ToArray();
+  .select(x => x.Name)
+  .distinct()
+  .toArray();
 
 console.log('dataA_D:', dataA_D);
 console.log('dataB_D:', dataB_D);
