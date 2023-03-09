@@ -16,8 +16,8 @@ let personList = [
   { Name: 'P3', Age: 17, Gender: 'Female', Dogs: [{ Name: 'D4' }, { Name: 'D5' }, { Name: 'D6' }] }
 ];
 
-// var results = new Linq(personList).SelectMany(p => new Linq(p.Dogs)).ToArray();
-let results = new Linq(parameters).SelectMany(x => new Linq(x.Numbers)).ToArray();
+// var results = new Linq(personList).selectMany(p => new Linq(p.Dogs)).toArray();
+let results = new Linq(parameters).selectMany(x => new Linq(x.Numbers)).toArray();
 
 console.log('results:', results);
 console.log('results:', results.length);

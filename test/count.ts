@@ -27,13 +27,13 @@ let parameters2: Bill[] = [
   { bill: 1, box: 'ten', sn: 'fruits1', status: 40 }
 ];
 
-intCount = new Linq<number>(intArray).Count();
-stringCount = new Linq(stringList).Count();
-intCount2 = new Linq<number>(intArray).Count(x => x % 2 === 0);
-stringCount2 = new Linq<string>(stringList).Count(x => x.indexOf('三') >= 0);
+intCount = new Linq<number>(intArray).count();
+stringCount = new Linq(stringList).count();
+intCount2 = new Linq<number>(intArray).count(x => x % 2 === 0);
+stringCount2 = new Linq<string>(stringList).count(x => x.indexOf('三') >= 0);
 
-const Qty = new Linq(parameters).Count(x => x.sn && x.sn.length > 0);
-const noQty = new Linq(parameters).Where(x => !x.sn);
+const Qty = new Linq(parameters).count(x => x.sn && x.sn.length > 0);
+const noQty = new Linq(parameters).where(x => !x.sn);
 
 console.log('intCount:', intCount);
 console.log('stringCount:', stringCount);
@@ -42,5 +42,5 @@ console.log('stringCount2:', stringCount2);
 console.log('Qty:', Qty);
 console.log('noQty:', noQty);
 
-new Linq(parameters).AddRange(parameters2);
+new Linq(parameters).addRange(parameters2);
 console.log(parameters);

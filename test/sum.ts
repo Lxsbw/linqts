@@ -18,11 +18,11 @@ let numbers = [
   { Age: 0.8, Name: '征史郎' }
 ];
 
-let ageSum = new Linq<Person>(parameters).Sum(x => x.Age);
-let ageSumByNum = new Linq(numbers).Sum(x => x.Age);
-let ageMax = new Linq<Person>(parameters).Max(x => x.Age);
-let ageMin = new Linq<Person>(parameters).Min(x => x.Age);
-let ageDivByNum = new Linq<Person>(numbers).Average(x => x.Age);
+let ageSum = new Linq<Person>(parameters).sum(x => x.Age);
+let ageSumByNum = new Linq(numbers).sum(x => x.Age);
+let ageMax = new Linq<Person>(parameters).max(x => x.Age);
+let ageMin = new Linq<Person>(parameters).min(x => x.Age);
+let ageDivByNum = new Linq<Person>(numbers).average(x => x.Age);
 
 console.log('ageSum:', ageSum);
 console.log('ageSumByNum:', ageSumByNum);

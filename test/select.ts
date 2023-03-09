@@ -8,11 +8,11 @@ const parameters = [
 ];
 
 const results = new Linq(parameters)
-  .Select(x => {
+  .select(x => {
     return { ID: x.ID, Name: x.Name };
   })
-  .ToArray();
+  .toArray();
 
-const results2 = new Linq(parameters).Select(value => value.Name).ToArray();
+const results2 = new Linq(parameters).select(value => value.Name).toArray();
 
 console.log('results:', results, results2);

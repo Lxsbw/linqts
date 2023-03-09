@@ -21,41 +21,41 @@ npm install linq-to-ts --save
 import { Linq } from 'linq-to-ts';
 ```
 
-### 1. All
+### 1. all
 
 ```typescript
 const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-const rst = new Linq<number>(numbers).All(x => x < 5);             // => false
+const rst = new Linq<number>(numbers).all(x => x < 5);             // => false
 ```
 
-### 2. Any
+### 2. any
 
 ```typescript
 const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-const rst = new Linq<number>(numbers).Any(x => x < 5);             // => true
+const rst = new Linq<number>(numbers).any(x => x < 5);             // => true
 ```
 
-### 3. Count
+### 3. count
 
 ```typescript
 const strArr = ['正一郎', '清次郎', '誠三郎', '征史郎'];
 const intArr = [1, 5, 8, 12, 15, 16];
 
-const rstStr = new Linq(strArr).Count();                           // => 4
-const rstInt = new Linq<number>(intArr).Count(x => x % 2 === 0);   // => 3
+const rstStr = new Linq(strArr).count();                           // => 4
+const rstInt = new Linq<number>(intArr).count(x => x % 2 === 0);   // => 3
 ```
 
-### 4. Where & ToArray
+### 4. where & toArray
 
 ```typescript
 const intArr = [0, 1, 2, 3, 4];
 // even number
-const rst = new Linq<number>(intArr).Where(x => x % 2 === 0).ToArray();  // => [ 0, 2, 4 ]
+const rst = new Linq<number>(intArr).where(x => x % 2 === 0).toArray();  // => [ 0, 2, 4 ]
 ```
 
-### 5. Select & ToArray
+### 5. select & toArray
 
 ```typescript
 const parameters = [
@@ -66,7 +66,7 @@ const parameters = [
 ];
 
 const rst = new Linq(parameters)
-  .Select(x => { return { ID: x.ID, Name: x.Name }; }).ToArray();
+  .select(x => { return { ID: x.ID, Name: x.Name }; }).toArray();
 // =>
 // [
 //   { ID: 5, Name: "正一郎" },
@@ -76,7 +76,7 @@ const rst = new Linq(parameters)
 // ]
 ```
 
-### 6. SelectMany
+### 6. selectMany
 
 ```typescript
 const parameters = [
@@ -86,11 +86,11 @@ const parameters = [
   { Name: '征史郎', Numbers: [9, 8, 7] }
 ];
 
-const rst = new Linq(parameters).SelectMany(x => new Linq(x.Numbers)).ToArray();  // => [1, 2, 3, 1, 3, 5, 2, 4, 6, 9, 8, 7]
+const rst = new Linq(parameters).selectMany(x => new Linq(x.Numbers)).toArray();  // => [1, 2, 3, 1, 3, 5, 2, 4, 6, 9, 8, 7]
 
 ```
 
-### 7. Distinct
+### 7. distinct
 
 ```typescript
 const intArr = [0, 1, 3, 3, 2];
@@ -101,11 +101,11 @@ const parameters = [
   { ID: 42, Rate: 0.3, Name: '征史郎' }
 ];
 
-const rstInt = new Linq(intArr).Distinct().ToArray();              // => [ 0, 1, 3, 2 ]
-const rstObj = new Linq(parameters).Select(x => x.Name).Distinct().ToArray(); // => [ "正一郎", "清次郎", "征史郎" ]
+const rstInt = new Linq(intArr).distinct().toArray();              // => [ 0, 1, 3, 2 ]
+const rstObj = new Linq(parameters).select(x => x.Name).distinct().toArray(); // => [ "正一郎", "清次郎", "征史郎" ]
 ```
 
-### 8. DistinctBy
+### 8. distinctBy
 
 ```typescript
 const data = [
@@ -114,12 +114,12 @@ const data = [
   { id: 2, name: 'two', category: 'vegetables', countries: ['Italy', 'Germany'] }
 ];
 
-const rstKey = new Linq(data).DistinctBy(x => x.category).ToArray();
+const rstKey = new Linq(data).distinctBy(x => x.category).toArray();
 const rstKeys = new Linq(data)
-  .DistinctBy(el => {
+  .distinctBy(el => {
     return { id: el.id, category: el.category };
   })
-  .ToArray();
+  .toArray();
 // rstKey =>
 // [
 //   { id: 1, name: "one", category: "fruits", countries: [ "lxsbw", "xliecz" ] },
@@ -132,7 +132,7 @@ const rstKeys = new Linq(data)
 // ]
 ```
 
-### 9. DistinctMap
+### 9. distinctMap
 
 ```javascript
 interface DisType {
@@ -152,15 +152,15 @@ const parameters = [
   { ID: 27, Rate: 0.0, Name: '正二郎' }
 ];
 
-let dataC_F = new Linq<DisType>(parameters).DistinctMap(x => x.Name).ToArray(); // => [ "正一郎", "清次郎", "征史郎" ]
+let dataC_F = new Linq<DisType>(parameters).distinctMap(x => x.Name).toArray(); // => [ "正一郎", "清次郎", "征史郎" ]
 let dataC_G = new Linq<DisType>(parameters)
-  .DistinctMap(x => {
+  .distinctMap(x => {
     return { Name: x.Name };
   })
-  .ToArray(); // => [ { Name: '正一郎' }, { Name: '清次郎' }, { Name: '征史郎' } ]
+  .toArray(); // => [ { Name: '正一郎' }, { Name: '清次郎' }, { Name: '征史郎' } ]
 ```
 
-### 10. First & FirstOrDefault
+### 10. first & firstOrDefault
 
 ```typescript
 const numbers = [1, 2, 3, 5, 7, 11];
@@ -171,22 +171,22 @@ const parameters = [
   { ID: 42, Name: '征史郎' }
 ];
 
-const rstInt = new Linq(numbers).First();                                      // => 1
-const rstObj = new Linq<Person>(parameters).FirstOrDefault(x => x.ID === 30);  // => undefined
-const rstObj = new Linq<Person>(parameters).FirstOrDefault(x => x.ID === 42);  // => { ID: 42, Name: '征史郎' }
+const rstInt = new Linq(numbers).first();                                      // => 1
+const rstObj = new Linq<Person>(parameters).firstOrDefault(x => x.ID === 30);  // => undefined
+const rstObj = new Linq<Person>(parameters).firstOrDefault(x => x.ID === 42);  // => { ID: 42, Name: '征史郎' }
 ```
 
-### 11. Remove
+### 11. remove
 
 ```typescript
 let numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 console.log(numbers.length);                                    // => 10
-new Linq(numbers).Remove(6);
+new Linq(numbers).remove(6);
 console.log(numbers.length);                                    // => 9
 ```
 
-### 12. OrderBy & OrderByDescending
+### 12. orderBy & orderByDescending
 
 ```typescript
 interface Person {
@@ -200,8 +200,8 @@ const parameters = [
   { ID: 5, Name: '征史郎' }
 ];
 
-const rst = new Linq<Person>(parameters).OrderBy(x => x.ID).ToArray();
-const rstDesc = new Linq<Person>(parameters).OrderByDescending(x => x.ID).ToArray();
+const rst = new Linq<Person>(parameters).orderBy(x => x.ID).toArray();
+const rstDesc = new Linq<Person>(parameters).orderByDescending(x => x.ID).toArray();
 // rst =>
 // [
 //   { ID: 0, Name: "正一郎" },
@@ -219,7 +219,7 @@ const rstDesc = new Linq<Person>(parameters).OrderByDescending(x => x.ID).ToArra
 
 ```
 
-### 13. ThenBy & ThenByDescending
+### 13. thenBy & thenByDescending
 
 ```typescript
 interface Person {
@@ -238,10 +238,10 @@ const persons = [
 ];
 
 const rst = new Linq<Person>(persons)
-  .OrderByDescending(x => x.ID)
-  .ThenBy(x => x.Age)
-  .ThenByDescending(x => x.Name).ToArray();
-// 1 OrderByDescending =>
+  .orderByDescending(x => x.ID)
+  .thenBy(x => x.Age)
+  .thenByDescending(x => x.Name).toArray();
+// 1 orderByDescending =>
 // [
 //   { ID: 2, Age: 2, Name: "G" },
 //   { ID: 2, Age: 18, Name: "C" },
@@ -251,7 +251,7 @@ const rst = new Linq<Person>(persons)
 //   { ID: 1, Age: 25, Name: "E" },
 //   { ID: 0, Age: 30, Name: "A" }
 // ]
-// 2 ThenBy =>
+// 2 thenBy =>
 // [
 //   { ID: 2, Age: 2, Name: "G" },
 //   { ID: 2, Age: 15, Name: "F" },
@@ -261,7 +261,7 @@ const rst = new Linq<Person>(persons)
 //   { ID: 1, Age: 30, Name: "D" },
 //   { ID: 0, Age: 30, Name: "A" }
 // ]
-// 3 ThenByDescending =>
+// 3 thenByDescending =>
 // [
 //   { ID: 2, Age: 2, Name: "G" },
 //   { ID: 2, Age: 15, Name: "F" },
@@ -273,7 +273,7 @@ const rst = new Linq<Person>(persons)
 // ]
 ```
 
-### 14. GroupBy
+### 14. groupBy
 
 ```typescript
 interface GroupObj {
@@ -288,8 +288,8 @@ const data = [
   { id: 2, name: 'two', category: 'vegetables', countries: ['Italy', 'Germany'] }
 ];
 
-const rstKey = new Linq<GroupObj>(data).GroupBy(el => el.category);
-const rstKeys = new Linq<GroupObj>(data).GroupBy(el => {
+const rstKey = new Linq<GroupObj>(data).groupBy(el => el.category);
+const rstKeys = new Linq<GroupObj>(data).groupBy(el => {
   return { id: el.id, category: el.category };
 });
 // rstKey =>
@@ -322,7 +322,7 @@ const rstKeys = new Linq<GroupObj>(data).GroupBy(el => {
 // ]
 ```
 
-### 15. Join
+### 15. join
 
 ```typescript
 const persons = [
@@ -342,7 +342,7 @@ const cities = [
 ];
 
 const rst = new Linq(persons)
-  .Join(
+  .join(
     new Linq(cities),
     p => p.CityID,
     c => c.ID,
@@ -350,7 +350,7 @@ const rst = new Linq(persons)
       return { CityID: c.ID, PersonName: p.Name, CityName: c.Name };
     }
   )
-  .ToArray();
+  .toArray();
 // rst =>
 // [
 //   { CityID: 1, PersonName: "ABC", CityName: "Guangzhou" },
@@ -362,7 +362,7 @@ const rst = new Linq(persons)
 // ]
 ```
 
-### 16. ToDictionary
+### 16. toDictionary
 
 ```typescript
 const parameters = [
@@ -372,10 +372,10 @@ const parameters = [
   { ID: 4, Age: 18, Name: '征史郎' }
 ];
 
-const dictionary = new Linq(parameters).ToDictionary(x => x.ID).ToArray();
+const dictionary = new Linq(parameters).toDictionary(x => x.ID).toArray();
 const dictionaryObj = new Linq(parameters)
-  .ToDictionary(x => { return { ID: x.ID, Name: x.Name }; })
-  .ToArray();
+  .toDictionary(x => { return { ID: x.ID, Name: x.Name }; })
+  .toArray();
 // dictionary =>
 // [
 //   { Key: 0, Value: { ID: 0, Age: 52, Name: "正一郎" } },
@@ -392,7 +392,7 @@ const dictionaryObj = new Linq(parameters)
 // ]
 ```
 
-### 17. Sum
+### 17. sum
 
 ```typescript
 interface Person {
@@ -406,10 +406,10 @@ const parameters = [
   { Age: 18, Name: '征史郎' }
 ];
 
-const rst = new Linq<Person>(parameters).Sum(x => x.Age);       // => 118
+const rst = new Linq<Person>(parameters).sum(x => x.Age);       // => 118
 ```
 
-### 18. Max
+### 18. max
 
 ```typescript
 interface Person {
@@ -423,10 +423,10 @@ const parameters = [
   { Age: 18, Name: '征史郎' }
 ];
 
-const rst = new Linq<Person>(parameters).Max(x => x.Age);       // => 52
+const rst = new Linq<Person>(parameters).max(x => x.Age);       // => 52
 ```
 
-### 19. Min
+### 19. min
 
 ```typescript
 interface Person {
@@ -440,23 +440,23 @@ const parameters = [
   { Age: 18, Name: '征史郎' }
 ];
 
-const rst = new Linq<Person>(parameters).Min(x => x.Age);       // => 18
+const rst = new Linq<Person>(parameters).min(x => x.Age);       // => 18
 ```
 
-### 20. Take
+### 20. take
 
 ```typescript
 const texts = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-const rst = new Linq(texts).Take(4).ToArray();                     // => [ "Sun", "Mon", "Tue", "Wed" ]
+const rst = new Linq(texts).take(4).toArray();                     // => [ "Sun", "Mon", "Tue", "Wed" ]
 ```
 
-### 21. Skip
+### 21. skip
 
 ```typescript
 const texts = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-const rst = new Linq(texts).Skip(4).ToArray();                     // => [ "Thu", "Fri", "Sat" ]
+const rst = new Linq(texts).skip(4).toArray();                     // => [ "Thu", "Fri", "Sat" ]
 ```
 
 ## Documentation

@@ -18,8 +18,8 @@ let data = [
 
 // 分组
 // let result = null;
-let result = new Linq(data).GroupBy(el => el.category);
-// let result = new Linq<GroupObj>(data).GroupBy(el => {
+let result = new Linq(data).groupBy(el => el.category);
+// let result = new Linq<GroupObj>(data).groupBy(el => {
 //   return { id: el.id, category: el.category };
 // });
 

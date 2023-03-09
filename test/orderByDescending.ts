@@ -14,7 +14,7 @@ parameters = [
 
 console.log('parameters:', parameters);
 
-orderedParameters = new Linq<Person>(parameters).OrderByDescending(x => x.ID).ToArray();
+orderedParameters = new Linq<Person>(parameters).orderByDescending(x => x.ID).toArray();
 
 // console.log('parameters:', parameters);
 console.log('orderedParameters:', orderedParameters);

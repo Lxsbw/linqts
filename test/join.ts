@@ -17,7 +17,7 @@ const cities = [
 ];
 
 const result = new Linq(persons)
-  .Join(
+  .join(
     new Linq(cities),
     p => p.CityID,
     c => c.ID,
@@ -25,6 +25,6 @@ const result = new Linq(persons)
       return { CityID: c.ID, PersonName: p.Name, CityName: c.Name };
     }
   )
-  .ToArray();
+  .toArray();
 
 console.log('result:', result);

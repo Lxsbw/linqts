@@ -21,51 +21,51 @@ class Linq<T> {
   /**
    * Adds an object to the end of the Linq<T>.
    */
-  public Add(element: T): void {
+  public add(element: T): void {
     this._elements.push(element);
   }
 
   /**
    * Appends an object to the end of the Linq<T>.
    */
-  public Append(element: T): void {
-    this.Add(element);
+  public append(element: T): void {
+    this.add(element);
   }
 
   /**
    * Add an object to the start of the Linq<T>.
    */
-  public Prepend(element: T): void {
+  public prepend(element: T): void {
     this._elements.unshift(element);
   }
 
   /**
    * Adds the elements of the specified collection to the end of the Linq<T>.
    */
-  public AddRange(elements: T[]): void {
+  public addRange(elements: T[]): void {
     this._elements.push(...elements);
   }
 
   /**
    * Applies an accumulator function over a sequence.
    */
-  public Aggregate<U>(accumulator: (accum: U, value?: T, index?: number, list?: T[]) => any, initialValue?: U): any {
+  public aggregate<U>(accumulator: (accum: U, value?: T, index?: number, list?: T[]) => any, initialValue?: U): any {
     return this._elements.reduce(accumulator, initialValue);
   }
 
   /**
    * Determines whether all elements of a sequence satisfy a condition.
    */
-  public All(predicate: PredicateType<T>): boolean {
+  public all(predicate: PredicateType<T>): boolean {
     return this._elements.every(predicate);
   }
 
   /**
    * Determines whether a sequence contains any elements.
    */
-  public Any(): boolean;
-  public Any(predicate: PredicateType<T>): boolean;
-  public Any(predicate?: PredicateType<T>): boolean {
+  public any(): boolean;
+  public any(predicate: PredicateType<T>): boolean;
+  public any(predicate?: PredicateType<T>): boolean {
     return predicate ? this._elements.some(predicate) : this._elements.length > 0;
   }
 
@@ -73,94 +73,94 @@ class Linq<T> {
    * Computes the average of a sequence of number values that are obtained by invoking
    * a transform function on each element of the input sequence.
    */
-  public Average(): number;
-  public Average(transform: (value?: T, index?: number, list?: T[]) => any): number;
-  public Average(transform?: (value?: T, index?: number, list?: T[]) => any): number {
-    return Tools.calcNumDiv(this.Sum(transform), this.Count());
+  public average(): number;
+  public average(transform: (value?: T, index?: number, list?: T[]) => any): number;
+  public average(transform?: (value?: T, index?: number, list?: T[]) => any): number {
+    return Tools.calcNumDiv(this.sum(transform), this.count());
   }
 
   /**
    * Casts the elements of a sequence to the specified type.
    */
-  public Cast<U>(): Linq<U> {
+  public cast<U>(): Linq<U> {
     return new Linq<U>(this._elements as any);
   }
 
   /**
    * Removes all elements from the Linq<T>.
    */
-  public Clear(): void {
+  public clear(): void {
     this._elements.length = 0;
   }
 
   /**
    * Concatenates two sequences.
    */
-  public Concat(list: Linq<T>): Linq<T> {
-    return new Linq<T>(this._elements.concat(list.ToArray()));
+  public concat(list: Linq<T>): Linq<T> {
+    return new Linq<T>(this._elements.concat(list.toArray()));
   }
 
   /**
    * Determines whether an element is in the Linq<T>.
    */
-  public Contains(element: T): boolean {
-    return this.Any(x => x === element);
+  public contains(element: T): boolean {
+    return this.any(x => x === element);
   }
 
   /**
    * Returns the number of elements in a sequence.
    */
-  public Count(): number;
-  public Count(predicate: PredicateType<T>): number;
-  public Count(predicate?: PredicateType<T>): number {
-    return predicate ? this.Where(predicate).Count() : this._elements.length;
+  public count(): number;
+  public count(predicate: PredicateType<T>): number;
+  public count(predicate?: PredicateType<T>): number {
+    return predicate ? this.where(predicate).count() : this._elements.length;
   }
 
   /**
    * Returns the elements of the specified sequence or the type parameter's default value
    * in a singleton collection if the sequence is empty.
    */
-  public DefaultIfEmpty(defaultValue?: T): Linq<T> {
-    return this.Count() ? this : new Linq<T>([defaultValue]);
+  public defaultIfEmpty(defaultValue?: T): Linq<T> {
+    return this.count() ? this : new Linq<T>([defaultValue]);
   }
 
   /**
    * Returns distinct elements from a sequence by using the default equality comparer to compare values.
    */
-  public Distinct(): Linq<T> {
-    return this.Where((value, index, iter) => (Tools.isObj(value) ? iter.findIndex(obj => Tools.equal(obj, value)) : iter.indexOf(value)) === index);
+  public distinct(): Linq<T> {
+    return this.where((value, index, iter) => (Tools.isObj(value) ? iter.findIndex(obj => Tools.equal(obj, value)) : iter.indexOf(value)) === index);
   }
 
   /**
    * Returns distinct elements from a sequence according to specified key selector.
    */
-  public DistinctBy<TOut>(keySelector: (key: T) => TOut): Linq<T> {
-    const groups: any = this.GroupBy(keySelector);
+  public distinctBy<TOut>(keySelector: (key: T) => TOut): Linq<T> {
+    const groups: any = this.groupBy(keySelector);
     const func = function (res: Linq<T>, key: T) {
-      const curr = new Linq<GroupType<T>>(groups).FirstOrDefault(x => Tools.equal(x.key, key));
-      res.Add(curr.elements[0]);
+      const curr = new Linq<GroupType<T>>(groups).firstOrDefault(x => Tools.equal(x.key, key));
+      res.add(curr.elements[0]);
       return res;
     };
     return new Linq<GroupType<T>>(groups)
-      .Select(x => x.key)
-      .ToArray()
+      .select(x => x.key)
+      .toArray()
       .reduce(func, new Linq<T>());
   }
 
   /**
-   * Returns distinct elements from a sequence by using the default equality comparer to compare values and this.Select method.
+   * Returns distinct elements from a sequence by using the default equality comparer to compare values and this.select method.
    */
-  public DistinctMap<TOut>(): Linq<T | TOut>;
-  public DistinctMap<TOut>(selector: (element: T, index: number) => TOut): Linq<T | TOut>;
-  public DistinctMap<TOut>(selector?: (element: T, index: number) => TOut): Linq<T | TOut> {
-    return selector ? this.Select(selector).Distinct() : this.Distinct();
+  public distinctMap<TOut>(): Linq<T | TOut>;
+  public distinctMap<TOut>(selector: (element: T, index: number) => TOut): Linq<T | TOut>;
+  public distinctMap<TOut>(selector?: (element: T, index: number) => TOut): Linq<T | TOut> {
+    return selector ? this.select(selector).distinct() : this.distinct();
   }
 
   /**
    * Returns the element at a specified index in a sequence.
    */
-  public ElementAt(index: number): T {
-    if (index < this.Count() && index >= 0) {
+  public elementAt(index: number): T {
+    if (index < this.count() && index >= 0) {
       return this._elements[index];
     } else {
       throw new Error('ArgumentOutOfRangeException: index is less than 0 or greater than or equal to the number of elements in source.');
@@ -170,25 +170,25 @@ class Linq<T> {
   /**
    * Returns the element at a specified index in a sequence or a default value if the index is out of range.
    */
-  public ElementAtOrDefault(index: number): T | null {
-    return index < this.Count() && index >= 0 ? this._elements[index] : undefined;
+  public elementAtOrDefault(index: number): T | null {
+    return index < this.count() && index >= 0 ? this._elements[index] : undefined;
   }
 
   /**
    * Produces the set difference of two sequences by using the default equality comparer to compare values.
    */
-  public Except(source: Linq<T>): Linq<T> {
-    return this.Where(x => !source.Contains(x));
+  public except(source: Linq<T>): Linq<T> {
+    return this.where(x => !source.contains(x));
   }
 
   /**
    * Returns the first element of a sequence.
    */
-  public First(): T;
-  public First(predicate: PredicateType<T>): T;
-  public First(predicate?: PredicateType<T>): T {
-    if (this.Count()) {
-      return predicate ? this.Where(predicate).First() : this._elements[0];
+  public first(): T;
+  public first(predicate: PredicateType<T>): T;
+  public first(predicate?: PredicateType<T>): T {
+    if (this.count()) {
+      return predicate ? this.where(predicate).first() : this._elements[0];
     } else {
       throw new Error('InvalidOperationException: The source sequence is empty.');
     }
@@ -197,27 +197,27 @@ class Linq<T> {
   /**
    * Returns the first element of a sequence, or a default value if the sequence contains no elements.
    */
-  public FirstOrDefault(): T;
-  public FirstOrDefault(predicate: PredicateType<T>): T;
-  public FirstOrDefault(predicate?: PredicateType<T>): T {
-    return this.Count(predicate) ? this.First(predicate) : undefined;
+  public firstOrDefault(): T;
+  public firstOrDefault(predicate: PredicateType<T>): T;
+  public firstOrDefault(predicate?: PredicateType<T>): T {
+    return this.count(predicate) ? this.first(predicate) : undefined;
   }
 
   /**
    * Performs the specified action on each element of the Linq<T>.
    */
-  public ForEach(action: (value?: T, index?: number, list?: T[]) => any): void {
+  public forEach(action: (value?: T, index?: number, list?: T[]) => any): void {
     return this._elements.forEach(action);
   }
 
   /**
    * Groups the elements of a sequence according to a specified key selector function.
    */
-  public GroupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): { [key: string]: TResult[] } {
+  public groupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): { [key: string]: TResult[] } {
     const initialValue: TResult[] = [];
     const func = function (ac: GroupType<TResult>[], v: T) {
       const key = grouper(v);
-      const existingGroup = new Linq<GroupType<TResult>>(ac).FirstOrDefault(x => Tools.equal(x.key, key));
+      const existingGroup = new Linq<GroupType<TResult>>(ac).firstOrDefault(x => Tools.equal(x.key, key));
       const mappedValue = mapper(v);
 
       if (existingGroup) {
@@ -229,18 +229,18 @@ class Linq<T> {
       }
       return ac;
     };
-    return this.Aggregate(func, initialValue);
+    return this.aggregate(func, initialValue);
   }
 
   /**
    * Correlates the elements of two sequences based on equality of keys and groups the results.
    * The default equality comparer is used to compare keys.
    */
-  public GroupJoin<U, R>(list: Linq<U>, key1: (k: T) => any, key2: (k: U) => any, result: (first: T, second: Linq<U>) => R): Linq<R> {
-    return this.Select(x =>
+  public groupJoin<U, R>(list: Linq<U>, key1: (k: T) => any, key2: (k: U) => any, result: (first: T, second: Linq<U>) => R): Linq<R> {
+    return this.select(x =>
       result(
         x,
-        list.Where(z => key1(x) === key2(z))
+        list.where(z => key1(x) === key2(z))
       )
     );
   }
@@ -248,14 +248,14 @@ class Linq<T> {
   /**
    * Returns the index of the first occurence of an element in the List.
    */
-  public IndexOf(element: T): number {
+  public indexOf(element: T): number {
     return this._elements.indexOf(element);
   }
 
   /**
    * Inserts an element into the Linq<T> at the specified index.
    */
-  public Insert(index: number, element: T): void | Error {
+  public insert(index: number, element: T): void | Error {
     if (index < 0 || index > this._elements.length) {
       throw new Error('Index is out of range.');
     }
@@ -266,25 +266,25 @@ class Linq<T> {
   /**
    * Produces the set intersection of two sequences by using the default equality comparer to compare values.
    */
-  public Intersect(source: Linq<T>): Linq<T> {
-    return this.Where(x => source.Contains(x));
+  public intersect(source: Linq<T>): Linq<T> {
+    return this.where(x => source.contains(x));
   }
 
   /**
    * Correlates the elements of two sequences based on matching keys. The default equality comparer is used to compare keys.
    */
-  public Join<U, R>(list: Linq<U>, key1: (key: T) => any, key2: (key: U) => any, result: (first: T, second: U) => R): Linq<R> {
-    return this.SelectMany(x => list.Where(y => key2(y) === key1(x)).Select(z => result(x, z)));
+  public join<U, R>(list: Linq<U>, key1: (key: T) => any, key2: (key: U) => any, result: (first: T, second: U) => R): Linq<R> {
+    return this.selectMany(x => list.where(y => key2(y) === key1(x)).select(z => result(x, z)));
   }
 
   /**
    * Returns the last element of a sequence.
    */
-  public Last(): T;
-  public Last(predicate: PredicateType<T>): T;
-  public Last(predicate?: PredicateType<T>): T {
-    if (this.Count()) {
-      return predicate ? this.Where(predicate).Last() : this._elements[this.Count() - 1];
+  public last(): T;
+  public last(predicate: PredicateType<T>): T;
+  public last(predicate?: PredicateType<T>): T {
+    if (this.count()) {
+      return predicate ? this.where(predicate).last() : this._elements[this.count() - 1];
     } else {
       throw Error('InvalidOperationException: The source sequence is empty.');
     }
@@ -293,18 +293,18 @@ class Linq<T> {
   /**
    * Returns the last element of a sequence, or a default value if the sequence contains no elements.
    */
-  public LastOrDefault(): T;
-  public LastOrDefault(predicate: PredicateType<T>): T;
-  public LastOrDefault(predicate?: PredicateType<T>): T {
-    return this.Count(predicate) ? this.Last(predicate) : undefined;
+  public lastOrDefault(): T;
+  public lastOrDefault(predicate: PredicateType<T>): T;
+  public lastOrDefault(predicate?: PredicateType<T>): T {
+    return this.count(predicate) ? this.last(predicate) : undefined;
   }
 
   /**
    * Returns the maximum value in a generic sequence.
    */
-  public Max(): number;
-  public Max(selector: (value: T, index: number, array: T[]) => number): number;
-  public Max(selector?: (value: T, index: number, array: T[]) => number): number {
+  public max(): number;
+  public max(selector: (value: T, index: number, array: T[]) => number): number;
+  public max(selector?: (value: T, index: number, array: T[]) => number): number {
     const id = x => x;
     return Math.max(...this._elements.map(selector || id));
   }
@@ -312,9 +312,9 @@ class Linq<T> {
   /**
    * Returns the minimum value in a generic sequence.
    */
-  public Min(): number;
-  public Min(selector: (value: T, index: number, array: T[]) => number): number;
-  public Min(selector?: (value: T, index: number, array: T[]) => number): number {
+  public min(): number;
+  public min(selector: (value: T, index: number, array: T[]) => number): number;
+  public min(selector?: (value: T, index: number, array: T[]) => number): number {
     const id = x => x;
     return Math.min(...this._elements.map(selector || id));
   }
@@ -322,7 +322,7 @@ class Linq<T> {
   /**
    * Filters the elements of a sequence based on a specified type.
    */
-  public OfType<U>(type: any): Linq<U> {
+  public ofType<U>(type: any): Linq<U> {
     let typeName;
     switch (type) {
       case Number:
@@ -341,13 +341,13 @@ class Linq<T> {
         typeName = null;
         break;
     }
-    return typeName === null ? this.Where(x => x instanceof type).Cast<U>() : this.Where(x => typeof x === typeName).Cast<U>();
+    return typeName === null ? this.where(x => x instanceof type).cast<U>() : this.where(x => typeof x === typeName).cast<U>();
   }
 
   /**
    * Sorts the elements of a sequence in ascending order according to a key.
    */
-  public OrderBy(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, false)): Linq<T> {
+  public orderBy(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, false)): Linq<T> {
     // tslint:disable-next-line: no-use-before-declare
     return new OrderedList<T>(Tools.cloneDeep(this._elements), comparer);
   }
@@ -355,7 +355,7 @@ class Linq<T> {
   /**
    * Sorts the elements of a sequence in descending order according to a key.
    */
-  public OrderByDescending(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, true)): Linq<T> {
+  public orderByDescending(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, true)): Linq<T> {
     // tslint:disable-next-line: no-use-before-declare
     return new OrderedList<T>(Tools.cloneDeep(this._elements), comparer);
   }
@@ -363,74 +363,74 @@ class Linq<T> {
   /**
    * Performs a subsequent ordering of the elements in a sequence in ascending order according to a key.
    */
-  public ThenBy(keySelector: (key: T) => any): Linq<T> {
-    return this.OrderBy(keySelector);
+  public thenBy(keySelector: (key: T) => any): Linq<T> {
+    return this.orderBy(keySelector);
   }
 
   /**
    * Performs a subsequent ordering of the elements in a sequence in descending order, according to a key.
    */
-  public ThenByDescending(keySelector: (key: T) => any): Linq<T> {
-    return this.OrderByDescending(keySelector);
+  public thenByDescending(keySelector: (key: T) => any): Linq<T> {
+    return this.orderByDescending(keySelector);
   }
 
   /**
    * Removes the first occurrence of a specific object from the Linq<T>.
    */
-  public Remove(element: T): boolean {
-    return this.IndexOf(element) !== -1 ? (this.RemoveAt(this.IndexOf(element)), true) : false;
+  public remove(element: T): boolean {
+    return this.indexOf(element) !== -1 ? (this.removeAt(this.indexOf(element)), true) : false;
   }
 
   /**
    * Removes all the elements that match the conditions defined by the specified predicate.
    */
-  public RemoveAll(predicate: PredicateType<T>): Linq<T> {
-    return this.Where(Tools.negate(predicate));
+  public removeAll(predicate: PredicateType<T>): Linq<T> {
+    return this.where(Tools.negate(predicate));
   }
 
   /**
    * Removes the element at the specified index of the Linq<T>.
    */
-  public RemoveAt(index: number): void {
+  public removeAt(index: number): void {
     this._elements.splice(index, 1);
   }
 
   /**
    * Reverses the order of the elements in the entire Linq<T>.
    */
-  public Reverse(): Linq<T> {
+  public reverse(): Linq<T> {
     return new Linq<T>(this._elements.reverse());
   }
 
   /**
    * Projects each element of a sequence into a new form.
    */
-  public Select<TOut>(selector: (element: T, index: number) => TOut): Linq<TOut> {
+  public select<TOut>(selector: (element: T, index: number) => TOut): Linq<TOut> {
     return new Linq<TOut>(this._elements.map(selector));
   }
 
   /**
    * Projects each element of a sequence to a List<any> and flattens the resulting sequences into one sequence.
    */
-  public SelectMany<TOut extends Linq<any>>(selector: (element: T, index: number) => TOut): TOut {
-    return this.Aggregate((ac, _, i) => (ac.AddRange(this.Select(selector).ElementAt(i).ToArray()), ac), new Linq<TOut>());
+  public selectMany<TOut extends Linq<any>>(selector: (element: T, index: number) => TOut): TOut {
+    return this.aggregate((ac, _, i) => (ac.addRange(this.select(selector).elementAt(i).toArray()), ac), new Linq<TOut>());
   }
 
   /**
    * Determines whether two sequences are equal by comparing the elements by using the default equality comparer for their type.
    */
-  public SequenceEqual(list: Linq<T>): boolean {
-    return this.All(e => list.Contains(e));
+  public sequenceEqual(list: Linq<T>): boolean {
+    return this.all(e => list.contains(e));
   }
 
   /**
    * Returns the only element of a sequence, and throws an exception if there is not exactly one element in the sequence.
    */
-  public Single(predicate?: PredicateType<T>): T {
-    if (this.Count(predicate) !== 1) {
+  public single(predicate?: PredicateType<T>): T {
+    if (this.count(predicate) !== 1) {
       throw new Error('The collection does not contain exactly one element.');
     } else {
-      return this.First(predicate);
+      return this.first(predicate);
     }
   }
 
@@ -438,80 +438,80 @@ class Linq<T> {
    * Returns the only element of a sequence, or a default value if the sequence is empty;
    * this method throws an exception if there is more than one element in the sequence.
    */
-  public SingleOrDefault(predicate?: PredicateType<T>): T {
-    return this.Count(predicate) ? this.Single(predicate) : undefined;
+  public singleOrDefault(predicate?: PredicateType<T>): T {
+    return this.count(predicate) ? this.single(predicate) : undefined;
   }
 
   /**
    * Bypasses a specified number of elements in a sequence and then returns the remaining elements.
    */
-  public Skip(amount: number): Linq<T> {
+  public skip(amount: number): Linq<T> {
     return new Linq<T>(this._elements.slice(Math.max(0, amount)));
   }
 
   /**
    * Omit the last specified number of elements in a sequence and then returns the remaining elements.
    */
-  public SkipLast(amount: number): Linq<T> {
+  public skipLast(amount: number): Linq<T> {
     return new Linq<T>(this._elements.slice(0, -Math.max(0, amount)));
   }
 
   /**
    * Bypasses elements in a sequence as long as a specified condition is true and then returns the remaining elements.
    */
-  public SkipWhile(predicate: PredicateType<T>): Linq<T> {
-    return this.Skip(this.Aggregate(ac => (predicate(this.ElementAt(ac)) ? ++ac : ac), 0));
+  public skipWhile(predicate: PredicateType<T>): Linq<T> {
+    return this.skip(this.aggregate(ac => (predicate(this.elementAt(ac)) ? ++ac : ac), 0));
   }
 
   /**
    * Computes the sum of the sequence of number values that are obtained by invoking
    * a transform function on each element of the input sequence.
    */
-  public Sum(): number;
-  public Sum(transform: (value?: T, index?: number, list?: T[]) => number): number;
-  public Sum(transform?: (value?: T, index?: number, list?: T[]) => number): number {
-    return transform ? this.Select(transform).Sum() : this.Aggregate((ac, v) => (ac = Tools.calcNum(ac, +v)), 0);
+  public sum(): number;
+  public sum(transform: (value?: T, index?: number, list?: T[]) => number): number;
+  public sum(transform?: (value?: T, index?: number, list?: T[]) => number): number {
+    return transform ? this.select(transform).sum() : this.aggregate((ac, v) => (ac = Tools.calcNum(ac, +v)), 0);
   }
 
   /**
    * Returns a specified number of contiguous elements from the start of a sequence.
    */
-  public Take(amount: number): Linq<T> {
+  public take(amount: number): Linq<T> {
     return new Linq<T>(this._elements.slice(0, Math.max(0, amount)));
   }
 
   /**
    * Returns a specified number of contiguous elements from the end of a sequence.
    */
-  public TakeLast(amount: number): Linq<T> {
+  public takeLast(amount: number): Linq<T> {
     return new Linq<T>(this._elements.slice(-Math.max(0, amount)));
   }
 
   /**
    * Returns elements from a sequence as long as a specified condition is true.
    */
-  public TakeWhile(predicate: PredicateType<T>): Linq<T> {
-    return this.Take(this.Aggregate(ac => (predicate(this.ElementAt(ac)) ? ++ac : ac), 0));
+  public takeWhile(predicate: PredicateType<T>): Linq<T> {
+    return this.take(this.aggregate(ac => (predicate(this.elementAt(ac)) ? ++ac : ac), 0));
   }
 
   /**
    * Copies the elements of the Linq<T> to a new array.
    */
-  public ToArray(): T[] {
+  public toArray(): T[] {
     return this._elements;
   }
 
   /**
    * Creates a Dictionary<TKey, TValue> from a Linq<T> according to a specified key selector function.
    */
-  public ToDictionary<TKey>(key: (key: T) => TKey): Linq<{ Key: TKey; Value: T }>;
-  public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }>;
-  public ToDictionary<TKey, TValue>(key: (key: T) => TKey, value?: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }> {
-    return this.Aggregate((dicc, v, i) => {
-      dicc[this.Select(key).ElementAt(i).toString()] = value ? this.Select(value).ElementAt(i) : v;
-      dicc.Add({
-        Key: this.Select(key).ElementAt(i),
-        Value: value ? this.Select(value).ElementAt(i) : v,
+  public toDictionary<TKey>(key: (key: T) => TKey): Linq<{ Key: TKey; Value: T }>;
+  public toDictionary<TKey, TValue>(key: (key: T) => TKey, value: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }>;
+  public toDictionary<TKey, TValue>(key: (key: T) => TKey, value?: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }> {
+    return this.aggregate((dicc, v, i) => {
+      dicc[this.select(key).elementAt(i).toString()] = value ? this.select(value).elementAt(i) : v;
+      dicc.add({
+        Key: this.select(key).elementAt(i),
+        Value: value ? this.select(value).elementAt(i) : v,
       });
       return dicc;
     }, new Linq<{ Key: TKey; Value: T | TValue }>());
@@ -520,36 +520,36 @@ class Linq<T> {
   /**
    * Creates a Linq<T> from an Enumerable.Linq<T>.
    */
-  public ToList(): Linq<T> {
+  public toList(): Linq<T> {
     return this;
   }
 
   /**
    * Creates a Lookup<TKey, TElement> from an IEnumerable<T> according to specified key selector and element selector functions.
    */
-  public ToLookup<TResult>(keySelector: (key: T) => string | number, elementSelector: (element: T) => TResult): { [key: string]: TResult[] } {
-    return this.GroupBy(keySelector, elementSelector);
+  public toLookup<TResult>(keySelector: (key: T) => string | number, elementSelector: (element: T) => TResult): { [key: string]: TResult[] } {
+    return this.groupBy(keySelector, elementSelector);
   }
 
   /**
    * Produces the set union of two sequences by using the default equality comparer.
    */
-  public Union(list: Linq<T>): Linq<T> {
-    return this.Concat(list).Distinct();
+  public union(list: Linq<T>): Linq<T> {
+    return this.concat(list).distinct();
   }
 
   /**
    * Filters a sequence of values based on a predicate.
    */
-  public Where(predicate: PredicateType<T>): Linq<T> {
+  public where(predicate: PredicateType<T>): Linq<T> {
     return new Linq<T>(this._elements.filter(predicate));
   }
 
   /**
    * Applies a specified function to the corresponding elements of two sequences, producing a sequence of the results.
    */
-  public Zip<U, TOut>(list: Linq<U>, result: (first: T, second: U) => TOut): Linq<TOut> {
-    return list.Count() < this.Count() ? list.Select((x, y) => result(this.ElementAt(y), x)) : this.Select((x, y) => result(x, list.ElementAt(y)));
+  public zip<U, TOut>(list: Linq<U>, result: (first: T, second: U) => TOut): Linq<TOut> {
+    return list.count() < this.count() ? list.select((x, y) => result(this.elementAt(y), x)) : this.select((x, y) => result(x, list.elementAt(y)));
   }
 }
 
@@ -557,7 +557,7 @@ class Linq<T> {
  * Represents a sorted sequence. The methods of this class are implemented by using deferred execution.
  * The immediate return value is an object that stores all the information that is required to perform the action.
  * The query represented by this method is not executed until the object is enumerated either by
- * calling its ToDictionary, ToLookup, ToList or ToArray methods
+ * calling its toDictionary, toLookup, toList or toArray methods
  */
 class OrderedList<T> extends Linq<T> {
   constructor(elements: T[], private _comparer: (a: T, b: T) => number) {
@@ -569,7 +569,7 @@ class OrderedList<T> extends Linq<T> {
    * Performs a subsequent ordering of the elements in a sequence in ascending order according to a key.
    * @override
    */
-  public ThenBy(keySelector: (key: T) => any): Linq<T> {
+  public thenBy(keySelector: (key: T) => any): Linq<T> {
     return new OrderedList(this._elements, Tools.composeComparers(this._comparer, Tools.keyComparer(keySelector, false)));
   }
 
@@ -577,7 +577,7 @@ class OrderedList<T> extends Linq<T> {
    * Performs a subsequent ordering of the elements in a sequence in descending order, according to a key.
    * @override
    */
-  public ThenByDescending(keySelector: (key: T) => any): Linq<T> {
+  public thenByDescending(keySelector: (key: T) => any): Linq<T> {
     return new OrderedList(this._elements, Tools.composeComparers(this._comparer, Tools.keyComparer(keySelector, true)));
   }
 }
