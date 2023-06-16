@@ -608,11 +608,14 @@ class Tools {
     if (a instanceof Date && b instanceof Date) {
       return a.getTime() === b.getTime();
     }
+    var entriesA = Object.entries(a);
+    var entriesB = Object.entries(b);
+    if (entriesA.length !== entriesB.length) return false;
 
     var Fn = (entries, _b): boolean => 
       entries.every(([key, val]) => Tools.isObject(val) ? Tools.equal(_b[key], val) : _b[key] === val);
 
-    return Fn(Object.entries(a), b) && Fn(Object.entries(b), a);
+    return Fn(entriesA, b) && Fn(entriesB, a);
   };
 
   /**
