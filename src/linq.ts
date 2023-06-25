@@ -128,7 +128,7 @@ class Linq<T> {
    * Returns distinct elements from a sequence by using the default equality comparer to compare values.
    */
   public distinct(): Linq<T> {
-    return this.where((value, index, iter) => (Tools.isObj(value) ? iter.findIndex(obj => Tools.equal(obj, value)) : iter.indexOf(value)) === index);
+    return this.where((value, index, iter) => (Tools.isObject(value) ? iter.findIndex(obj => Tools.equal(obj, value)) : iter.indexOf(value)) === index);
   }
 
   /**
@@ -511,7 +511,7 @@ class Linq<T> {
       dicc[this.select(key).elementAt(i).toString()] = value ? this.select(value).elementAt(i) : v;
       dicc.add({
         Key: this.select(key).elementAt(i),
-        Value: value ? this.select(value).elementAt(i) : v,
+        Value: value ? this.select(value).elementAt(i) : v
       });
       return dicc;
     }, new Linq<{ Key: TKey; Value: T | TValue }>());
@@ -551,6 +551,13 @@ class Linq<T> {
   public zip<U, TOut>(list: Linq<U>, result: (first: T, second: U) => TOut): Linq<TOut> {
     return list.count() < this.count() ? list.select((x, y) => result(this.elementAt(y), x)) : this.select((x, y) => result(x, list.elementAt(y)));
   }
+
+  /**
+   * Determine if two objects are equal.
+   */
+  // public equals<T, U>(param1: T | any, param2: U | any): boolean {
+  //   return Tools.equal(param1, param2);
+  // }
 }
 
 /**
@@ -589,17 +596,34 @@ class Tools {
   /**
    * Checks if the argument passed is an object
    */
-  static isObj = <T>(x: T): boolean => !!x && typeof x === 'object';
+  static isObject = <T>(x: T): boolean => !!x && typeof x === 'object';
 
   /**
    * Determine if two objects are equal
    */
-  static equal = <T, U>(a: T | any, b: U | any) => {
+  static equal = <T, U>(a: T | any, b: U | any): boolean => {
     if (a === b) return true;
-    if (typeof a != typeof b) return false;
-    if (!(a instanceof Object)) return a === b;
-    // Cannot compare simple types
-    return Object.entries(a).every(([key, val]) => (Tools.isObj(val) ? Tools.equal(b[key], val) : b[key] === val));
+    if (typeof a !== typeof b) return false;
+    if (!this.isObject(a) || !this.isObject(b)) return a === b;
+
+    const types = [a, b].map(x => x.constructor);
+    if (types[0] !== types[1]) return false;
+
+    if (a instanceof Date && b instanceof Date) {
+      return a.getTime() === b.getTime();
+    }
+    if (a instanceof RegExp && b instanceof RegExp) {
+      return a.toString() === b.toString();
+    }
+
+    var entriesA = Object.entries(a);
+    var entriesB = Object.entries(b);
+    if (entriesA.length !== entriesB.length) return false;
+
+    var Fn = (entries, _b): boolean =>
+      entries.every(([key, val]) => Tools.isObject(val) ? Tools.equal(_b[key], val) : _b[key] === val);
+
+    return Fn(entriesA, b) && Fn(entriesB, a);
   };
 
   /**
@@ -697,6 +721,10 @@ class Tools {
    * Clone data
    */
   static cloneDeep = <T, Y>(obj: T): T | Y => {
+    if (typeof structuredClone === 'function') {
+      return structuredClone(obj);
+    }
+
     let result;
     // Handle the 3 simple types, and null or undefined
     if (null === obj || 'object' !== typeof obj) {
