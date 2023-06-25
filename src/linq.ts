@@ -555,9 +555,9 @@ class Linq<T> {
   /**
    * Determine if two objects are equal.
    */
-  public equals<T, U>(param1: T | any, param2: U | any): boolean {
-    return Tools.equal(param1, param2);
-  }
+  // public equals<T, U>(param1: T | any, param2: U | any): boolean {
+  //   return Tools.equal(param1, param2);
+  // }
 }
 
 /**
@@ -605,14 +605,16 @@ class Tools {
     if (a === b) return true;
     if (typeof a !== typeof b) return false;
     if (!this.isObject(a) || !this.isObject(b)) return a === b;
+
+    const types = [a, b].map(x => x.constructor);
+    if (types[0] !== types[1]) return false;
+
     if (a instanceof Date && b instanceof Date) {
       return a.getTime() === b.getTime();
     }
     if (a instanceof RegExp && b instanceof RegExp) {
       return a.toString() === b.toString();
     }
-    const types = [a, b].map(x => x.constructor);
-    if (types[0] !== types[1]) return false;
 
     var entriesA = Object.entries(a);
     var entriesB = Object.entries(b);
