@@ -508,7 +508,7 @@ class Linq<T> {
   public toDictionary<TKey, TValue>(key: (key: T) => TKey, value: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }>;
   public toDictionary<TKey, TValue>(key: (key: T) => TKey, value?: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }> {
     return this.aggregate((dicc, v, i) => {
-      dicc[this.select(key).elementAt(i).toString()] = value ? this.select(value).elementAt(i) : v;
+      // dicc[this.select(key).elementAt(i).toString()] = value ? this.select(value).elementAt(i) : v;
       dicc.add({
         Key: this.select(key).elementAt(i),
         Value: value ? this.select(value).elementAt(i) : v
@@ -616,12 +616,11 @@ class Tools {
       return a.toString() === b.toString();
     }
 
-    var entriesA = Object.entries(a);
-    var entriesB = Object.entries(b);
+    const entriesA = Object.entries(a);
+    const entriesB = Object.entries(b);
     if (entriesA.length !== entriesB.length) return false;
 
-    var Fn = (entries, _b): boolean =>
-      entries.every(([key, val]) => Tools.isObject(val) ? Tools.equal(_b[key], val) : _b[key] === val);
+    const Fn = (entries, _b): boolean => entries.every(([key, val]) => (this.isObject(val) ? this.equal(_b[key], val) : _b[key] === val));
 
     return Fn(entriesA, b) && Fn(entriesB, a);
   };
@@ -672,7 +671,7 @@ class Tools {
       const sortKeyA = _keySelector(a);
       const sortKeyB = _keySelector(b);
 
-      if (Tools.isString(sortKeyA) && Tools.isString(sortKeyB)) {
+      if (this.isString(sortKeyA) && this.isString(sortKeyB)) {
         return _stringComparer(sortKeyA, sortKeyB);
       }
       return _comparer(sortKeyA, sortKeyB);
@@ -683,8 +682,8 @@ class Tools {
    * Number calculate addition
    */
   static calcNum = (num1: number, num2: number): number => {
-    if (!Tools.isNum(num1) || !Tools.isNum(num2)) return 0;
-    const { mult, place } = Tools.calcMultiple(num1, num2);
+    if (!this.isNum(num1) || !this.isNum(num2)) return 0;
+    const { mult, place } = this.calcMultiple(num1, num2);
     return Number(((num1 * mult + num2 * mult) / mult).toFixed(place));
   };
 
@@ -745,7 +744,7 @@ class Tools {
     if (obj instanceof Array) {
       result = [];
       for (let i in obj) {
-        result.push(Tools.cloneDeep(obj[i]));
+        result.push(this.cloneDeep(obj[i]));
       }
       return result;
     }
@@ -754,7 +753,7 @@ class Tools {
       result = {};
       for (let i in obj) {
         if (obj.hasOwnProperty(i)) {
-          result[i] = Tools.cloneDeep(obj[i]);
+          result[i] = this.cloneDeep(obj[i]);
         }
       }
       return result;
