@@ -214,23 +214,39 @@ class Linq<T> {
    * Groups the elements of a sequence according to a specified key selector function.
    */
   public groupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): { [key: string]: TResult[] } {
-    const initialValue: TResult[] = [];
-    const func = function (ac: GroupType<TResult>[], v: T) {
-      const key = grouper(v);
-      const existingGroup = new Linq<GroupType<TResult>>(ac).firstOrDefault(x => Tools.equal(x.key, key));
-      const mappedValue = mapper(v);
+    const groupMap = new Map();
+    for (let element of this._elements) {
+      const key = Tools.getHash(grouper(element));
+      const mappedValue = mapper(element);
 
-      if (existingGroup) {
-        existingGroup.elements.push(mappedValue);
-        existingGroup.count++;
-      } else {
-        const existingMap = { key: key, count: 1, elements: [mappedValue] };
-        ac.push(existingMap);
+      if (!groupMap.has(key)) {
+        groupMap.set(key, { key: grouper(element), count: 0, elements: [] });
       }
-      return ac;
-    };
-    return this.aggregate(func, initialValue);
+
+      const group = groupMap.get(key);
+      group.elements.push(mappedValue);
+      group.count++;
+    }
+    return Array.from(groupMap.values()) as any;
   }
+
+  // public groupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): { [key: string]: TResult[] } {
+  //   const initialValue: TResult[] = [];
+  //   const func = function (ac: GroupType<TResult>[], v: T) {
+  //     const key = grouper(v);
+  //     const existingGroup = new Linq<GroupType<TResult>>(ac).firstOrDefault(x => Tools.equal(x.key, key));
+  //     const mappedValue = mapper(v);
+  //     if (existingGroup) {
+  //       existingGroup.elements.push(mappedValue);
+  //       existingGroup.count++;
+  //     } else {
+  //       const existingMap = { key: key, count: 1, elements: [mappedValue] };
+  //       ac.push(existingMap);
+  //     }
+  //     return ac;
+  //   };
+  //   return this.aggregate(func, initialValue);
+  // }
 
   /**
    * Correlates the elements of two sequences based on equality of keys and groups the results.
@@ -511,7 +527,7 @@ class Linq<T> {
       // dicc[this.select(key).elementAt(i).toString()] = value ? this.select(value).elementAt(i) : v;
       dicc.add({
         Key: this.select(key).elementAt(i),
-        Value: value ? this.select(value).elementAt(i) : v
+        Value: value ? this.select(value).elementAt(i) : v,
       });
       return dicc;
     }, new Linq<{ Key: TKey; Value: T | TValue }>());
@@ -689,9 +705,14 @@ class Tools {
 
   /**
    * Number calculate division
-   * To be improved
    */
-  static calcNumDiv = (num1: number, num2: number): number => num1 / num2;
+  static calcNumDiv = (num1: number, num2: number): number => {
+    if (!this.isNum(num1) || !this.isNum(num2)) return 0;
+    const { mult } = this.calcMultiple(num1, num2);
+    const val = (num1 * mult) / (num2 * mult);
+    const { place } = this.calcMultiple(num1, val);
+    return Number(val.toFixed(place));
+  };
 
   /**
    * Check number
@@ -759,6 +780,39 @@ class Tools {
       return result;
     }
     throw new Error("Unable to copy param! Its type isn't supported.");
+  };
+
+  /**
+   * Generate Hash
+   */
+  static getHash = <T>(obj: T): String => {
+    let hashValue = '';
+
+    const typeOf = (obj): String => {
+      return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
+    };
+
+    const generateHash = (value): String => {
+      const type = typeOf(value);
+      switch (type) {
+        case 'object':
+          const keys = Object.keys(value).sort();
+          keys.forEach(key => {
+            hashValue += `${key}:${generateHash(value[key])};`;
+          });
+          break;
+        case 'array':
+          value.forEach(item => {
+            hashValue += `${generateHash(item)},`;
+          });
+          break;
+        default:
+          hashValue += value.toString();
+          break;
+      }
+      return hashValue;
+    };
+    return generateHash(obj);
   };
 }
 
