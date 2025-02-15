@@ -213,7 +213,7 @@ class Linq<T> {
   /**
    * Groups the elements of a sequence according to a specified key selector function.
    */
-  public groupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): { [key: string]: TResult[] } {
+  public groupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): TResult[] {
     const groupMap = new Map();
     for (let element of this._elements) {
       const key = Tools.getHash(grouper(element));
@@ -227,10 +227,9 @@ class Linq<T> {
       group.elements.push(mappedValue);
       group.count++;
     }
-    return Array.from(groupMap.values()) as any;
+    return Array.from(groupMap.values());
   }
-
-  // public groupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): { [key: string]: TResult[] } {
+  // public groupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): TResult[] {
   //   const initialValue: TResult[] = [];
   //   const func = function (ac: GroupType<TResult>[], v: T) {
   //     const key = grouper(v);
@@ -543,7 +542,7 @@ class Linq<T> {
   /**
    * Creates a Lookup<TKey, TElement> from an IEnumerable<T> according to specified key selector and element selector functions.
    */
-  public toLookup<TResult>(keySelector: (key: T) => string | number, elementSelector: (element: T) => TResult): { [key: string]: TResult[] } {
+  public toLookup<TResult>(keySelector: (key: T) => string | number, elementSelector: (element: T) => TResult): TResult[] {
     return this.groupBy(keySelector, elementSelector);
   }
 
