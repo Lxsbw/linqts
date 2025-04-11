@@ -213,13 +213,33 @@ class Linq<T> {
   /**
    * Groups the elements of a sequence according to a specified key selector function.
    */
-  public groupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): { [key: string]: TResult[] } {
+  public groupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): TResult[] {
+    const groupMap = new Map();
+    for (let element of this._elements) {
+      const key = Tools.getHash(grouper(element));
+      const mappedValue = mapper(element);
+
+      if (!groupMap.has(key)) {
+        groupMap.set(key, { key: grouper(element), count: 0, elements: [] });
+      }
+
+      const group = groupMap.get(key);
+      group.elements.push(mappedValue);
+      group.count++;
+    }
+    return Array.from(groupMap.values());
+  }
+
+  /**
+   * Groups the elements of a sequence according to a specified key selector function.
+   * a little data.
+   */
+  public groupByMini<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): TResult[] {
     const initialValue: TResult[] = [];
     const func = function (ac: GroupType<TResult>[], v: T) {
       const key = grouper(v);
       const existingGroup = new Linq<GroupType<TResult>>(ac).firstOrDefault(x => Tools.equal(x.key, key));
       const mappedValue = mapper(v);
-
       if (existingGroup) {
         existingGroup.elements.push(mappedValue);
         existingGroup.count++;
@@ -349,7 +369,7 @@ class Linq<T> {
    */
   public orderBy(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, false)): Linq<T> {
     // tslint:disable-next-line: no-use-before-declare
-    return new OrderedList<T>(Tools.cloneDeep(this._elements), comparer);
+    return new OrderedList<T>(Tools.arrayMap(this._elements), comparer);
   }
 
   /**
@@ -357,7 +377,7 @@ class Linq<T> {
    */
   public orderByDescending(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, true)): Linq<T> {
     // tslint:disable-next-line: no-use-before-declare
-    return new OrderedList<T>(Tools.cloneDeep(this._elements), comparer);
+    return new OrderedList<T>(Tools.arrayMap(this._elements), comparer);
   }
 
   /**
@@ -508,10 +528,10 @@ class Linq<T> {
   public toDictionary<TKey, TValue>(key: (key: T) => TKey, value: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }>;
   public toDictionary<TKey, TValue>(key: (key: T) => TKey, value?: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }> {
     return this.aggregate((dicc, v, i) => {
-      dicc[this.select(key).elementAt(i).toString()] = value ? this.select(value).elementAt(i) : v;
+      // dicc[this.select(key).elementAt(i).toString()] = value ? this.select(value).elementAt(i) : v;
       dicc.add({
         Key: this.select(key).elementAt(i),
-        Value: value ? this.select(value).elementAt(i) : v
+        Value: value ? this.select(value).elementAt(i) : v,
       });
       return dicc;
     }, new Linq<{ Key: TKey; Value: T | TValue }>());
@@ -527,7 +547,7 @@ class Linq<T> {
   /**
    * Creates a Lookup<TKey, TElement> from an IEnumerable<T> according to specified key selector and element selector functions.
    */
-  public toLookup<TResult>(keySelector: (key: T) => string | number, elementSelector: (element: T) => TResult): { [key: string]: TResult[] } {
+  public toLookup<TResult>(keySelector: (key: T) => string | number, elementSelector: (element: T) => TResult): TResult[] {
     return this.groupBy(keySelector, elementSelector);
   }
 
@@ -616,12 +636,11 @@ class Tools {
       return a.toString() === b.toString();
     }
 
-    var entriesA = Object.entries(a);
-    var entriesB = Object.entries(b);
+    const entriesA = Object.entries(a);
+    const entriesB = Object.entries(b);
     if (entriesA.length !== entriesB.length) return false;
 
-    var Fn = (entries, _b): boolean =>
-      entries.every(([key, val]) => Tools.isObject(val) ? Tools.equal(_b[key], val) : _b[key] === val);
+    const Fn = (entries, _b): boolean => entries.every(([key, val]) => (this.isObject(val) ? this.equal(_b[key], val) : _b[key] === val));
 
     return Fn(entriesA, b) && Fn(entriesB, a);
   };
@@ -672,7 +691,7 @@ class Tools {
       const sortKeyA = _keySelector(a);
       const sortKeyB = _keySelector(b);
 
-      if (Tools.isString(sortKeyA) && Tools.isString(sortKeyB)) {
+      if (this.isString(sortKeyA) && this.isString(sortKeyB)) {
         return _stringComparer(sortKeyA, sortKeyB);
       }
       return _comparer(sortKeyA, sortKeyB);
@@ -683,16 +702,19 @@ class Tools {
    * Number calculate addition
    */
   static calcNum = (num1: number, num2: number): number => {
-    if (!Tools.isNum(num1) || !Tools.isNum(num2)) return 0;
-    const { mult, place } = Tools.calcMultiple(num1, num2);
+    if (!this.isNum(num1) || !this.isNum(num2)) return 0;
+    const { mult, place } = this.calcMultiple(num1, num2);
     return Number(((num1 * mult + num2 * mult) / mult).toFixed(place));
   };
 
   /**
    * Number calculate division
-   * To be improved
    */
-  static calcNumDiv = (num1: number, num2: number): number => num1 / num2;
+  static calcNumDiv = (num1: number, num2: number): number => {
+    if (!this.isNum(num1) || !this.isNum(num2)) return 0;
+    const { mult } = this.calcMultiple(num1, num2);
+    return (num1 * mult) / (num2 * mult);
+  };
 
   /**
    * Check number
@@ -705,6 +727,11 @@ class Tools {
   static isString = (args): boolean => typeof args === 'string' && args.constructor === String;
 
   /**
+   * Check array
+   */
+  static isArray = (array): boolean => Array.isArray(array);
+
+  /**
    * Calculation multiple
    */
   static calcMultiple = (num1: number, num2: number): any => {
@@ -715,6 +742,16 @@ class Tools {
     const mult = Math.pow(10, Math.max(sq1, sq2));
     const place = sq1 >= sq2 ? sq1 : sq2;
     return { mult, place };
+  };
+
+  /**
+   * Build array new reference
+   */
+  static arrayMap = <T>(array): T => {
+    if (!this.isArray(array)) {
+      return array;
+    }
+    return array.map(x => x);
   };
 
   /**
@@ -745,7 +782,7 @@ class Tools {
     if (obj instanceof Array) {
       result = [];
       for (let i in obj) {
-        result.push(Tools.cloneDeep(obj[i]));
+        result.push(this.cloneDeep(obj[i]));
       }
       return result;
     }
@@ -754,12 +791,54 @@ class Tools {
       result = {};
       for (let i in obj) {
         if (obj.hasOwnProperty(i)) {
-          result[i] = Tools.cloneDeep(obj[i]);
+          result[i] = this.cloneDeep(obj[i]);
         }
       }
       return result;
     }
     throw new Error("Unable to copy param! Its type isn't supported.");
+  };
+
+  /**
+   * Generate Hash
+   */
+  static getHash = <T>(obj: T): String => {
+    let hashValue = '';
+
+    const typeOf = (obj): String => {
+      return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
+    };
+
+    const generateHash = (value): String => {
+      const type = typeOf(value);
+      switch (type) {
+        case 'object':
+          const keys = Object.keys(value).sort();
+          keys.forEach(key => {
+            hashValue += `${key}:${generateHash(value[key])};`;
+          });
+          break;
+        case 'array':
+          value.forEach(item => {
+            hashValue += `${generateHash(item)},`;
+          });
+          break;
+        case 'boolean':
+          hashValue += `boolean<>_<>_<>${value.toString()}`;
+          break;
+        case 'null':
+          hashValue += 'null<>_<>_<>';
+          break;
+        case 'undefined':
+          hashValue += 'undefined<>_<>_<>';
+          break;
+        default:
+          hashValue += value ? value.toString() : '';
+          break;
+      }
+      return hashValue;
+    };
+    return generateHash(obj);
   };
 }
 
