@@ -229,23 +229,28 @@ class Linq<T> {
     }
     return Array.from(groupMap.values());
   }
-  // public groupBy<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): TResult[] {
-  //   const initialValue: TResult[] = [];
-  //   const func = function (ac: GroupType<TResult>[], v: T) {
-  //     const key = grouper(v);
-  //     const existingGroup = new Linq<GroupType<TResult>>(ac).firstOrDefault(x => Tools.equal(x.key, key));
-  //     const mappedValue = mapper(v);
-  //     if (existingGroup) {
-  //       existingGroup.elements.push(mappedValue);
-  //       existingGroup.count++;
-  //     } else {
-  //       const existingMap = { key: key, count: 1, elements: [mappedValue] };
-  //       ac.push(existingMap);
-  //     }
-  //     return ac;
-  //   };
-  //   return this.aggregate(func, initialValue);
-  // }
+
+  /**
+   * Groups the elements of a sequence according to a specified key selector function.
+   * a little data.
+   */
+  public groupByMini<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): TResult[] {
+    const initialValue: TResult[] = [];
+    const func = function (ac: GroupType<TResult>[], v: T) {
+      const key = grouper(v);
+      const existingGroup = new Linq<GroupType<TResult>>(ac).firstOrDefault(x => Tools.equal(x.key, key));
+      const mappedValue = mapper(v);
+      if (existingGroup) {
+        existingGroup.elements.push(mappedValue);
+        existingGroup.count++;
+      } else {
+        const existingMap = { key: key, count: 1, elements: [mappedValue] };
+        ac.push(existingMap);
+      }
+      return ac;
+    };
+    return this.aggregate(func, initialValue);
+  }
 
   /**
    * Correlates the elements of two sequences based on equality of keys and groups the results.
@@ -364,7 +369,7 @@ class Linq<T> {
    */
   public orderBy(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, false)): Linq<T> {
     // tslint:disable-next-line: no-use-before-declare
-    return new OrderedList<T>(Tools.cloneDeep(this._elements), comparer);
+    return new OrderedList<T>(Tools.arrayMap(this._elements), comparer);
   }
 
   /**
@@ -372,7 +377,7 @@ class Linq<T> {
    */
   public orderByDescending(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, true)): Linq<T> {
     // tslint:disable-next-line: no-use-before-declare
-    return new OrderedList<T>(Tools.cloneDeep(this._elements), comparer);
+    return new OrderedList<T>(Tools.arrayMap(this._elements), comparer);
   }
 
   /**
@@ -708,9 +713,7 @@ class Tools {
   static calcNumDiv = (num1: number, num2: number): number => {
     if (!this.isNum(num1) || !this.isNum(num2)) return 0;
     const { mult } = this.calcMultiple(num1, num2);
-    const val = (num1 * mult) / (num2 * mult);
-    const { place } = this.calcMultiple(num1, val);
-    return Number(val.toFixed(place));
+    return (num1 * mult) / (num2 * mult);
   };
 
   /**
@@ -724,6 +727,11 @@ class Tools {
   static isString = (args): boolean => typeof args === 'string' && args.constructor === String;
 
   /**
+   * Check array
+   */
+  static isArray = (array): boolean => Array.isArray(array);
+
+  /**
    * Calculation multiple
    */
   static calcMultiple = (num1: number, num2: number): any => {
@@ -734,6 +742,16 @@ class Tools {
     const mult = Math.pow(10, Math.max(sq1, sq2));
     const place = sq1 >= sq2 ? sq1 : sq2;
     return { mult, place };
+  };
+
+  /**
+   * Build array new reference
+   */
+  static arrayMap = <T>(array): T => {
+    if (!this.isArray(array)) {
+      return array;
+    }
+    return array.map(x => x);
   };
 
   /**
@@ -805,8 +823,17 @@ class Tools {
             hashValue += `${generateHash(item)},`;
           });
           break;
+        case 'boolean':
+          hashValue += `boolean<>_<>_<>${value.toString()}`;
+          break;
+        case 'null':
+          hashValue += 'null<>_<>_<>';
+          break;
+        case 'undefined':
+          hashValue += 'undefined<>_<>_<>';
+          break;
         default:
-          hashValue += value.toString();
+          hashValue += value ? value.toString() : '';
           break;
       }
       return hashValue;

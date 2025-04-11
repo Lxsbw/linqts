@@ -10,7 +10,17 @@ interface GroupObj {
 let data = [
   { id: 1, name: 'one', category: 'fruits', countries: ['lxsbw', 'xliecz'] },
   { id: 1, name: 'one', category: 'fruits', countries: ['Italy', 'Austria'] },
-  { id: 2, name: 'two', category: 'vegetables', countries: ['Italy', 'Germany'] }
+  { id: 2, name: 'two', category: 'vegetables', countries: ['Italy', 'Germany'] },
+  { id: 2, name: 'two', category: null, countries: ['Italy', 'Germany'] },
+  { id: 2, name: 'two', category: undefined, countries: ['Italy', 'Germany'] },
+  { id: 2, name: 'two', category: '', countries: ['Italy', 'Germany'] },
+  { id: 2, name: 'two', category: ' ', countries: ['Italy', 'Germany'] },
+  { id: 2, name: 'two', category: '  ', countries: ['Italy', 'Germany'] },
+  { id: 2, name: 'two', category: true, countries: ['Italy', 'Germany'] },
+  { id: 2, name: 'two', category: false, countries: ['Italy', 'Germany'] },
+  { id: 2, name: 'two', countries: ['Italy', 'Germany'] },
+  { id: 2, name: 'two', category: 'true', countries: ['Italy', 'Germany'] },
+  { id: 2, name: 'two', category: 'false', countries: ['Italy', 'Germany'] },
   // { id: 3, name: 'three', category: 'vegetables', countries: ['Germany'] },
   // { id: 4, name: 'four', category: 'fruits', countries: ['Japan'] },
   // { id: 5, name: 'five', category: 'fruits', countries: ['Japan', 'Italy'] }
@@ -19,6 +29,7 @@ let data = [
 // 分组
 // let result = null;
 let result = new Linq(data).groupBy(el => el.category);
+let resultMini = new Linq(data).groupByMini(el => el.category);
 // let result = new Linq<GroupObj>(data).groupBy(el => {
 //   return { id: el.id, category: el.category };
 // });
@@ -27,5 +38,6 @@ let result = new Linq(data).groupBy(el => el.category);
 
 // result.forEach(x => console.log(x.key, x.count, x.elements));
 console.log('result:', result);
+console.log('resultMini:', resultMini);
 // result.forEach((x) => console.log(x.elements));
 // console.log('result:', JSON.stringify(result));
