@@ -10,12 +10,14 @@ interface GroupType<T> {
  */
 class Linq<T> {
   protected _elements: T[];
+  protected _locales: string | string[];
 
   /**
    * Defaults the elements of the list
    */
-  constructor(elements: T[] = []) {
+  constructor(elements: T[] = [], locales: string | string[] = null) {
     this._elements = elements;
+    this._locales = locales;
   }
 
   /**
@@ -367,17 +369,17 @@ class Linq<T> {
   /**
    * Sorts the elements of a sequence in ascending order according to a key.
    */
-  public orderBy(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, false)): Linq<T> {
+  public orderBy(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, false, this._locales)): Linq<T> {
     // tslint:disable-next-line: no-use-before-declare
-    return new OrderedList<T>(Tools.arrayMap(this._elements), comparer);
+    return new OrderedList<T>(Tools.arrayMap(this._elements), comparer, this._locales);
   }
 
   /**
    * Sorts the elements of a sequence in descending order according to a key.
    */
-  public orderByDescending(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, true)): Linq<T> {
+  public orderByDescending(keySelector: (key: T) => any, comparer = Tools.keyComparer(keySelector, true, this._locales)): Linq<T> {
     // tslint:disable-next-line: no-use-before-declare
-    return new OrderedList<T>(Tools.arrayMap(this._elements), comparer);
+    return new OrderedList<T>(Tools.arrayMap(this._elements), comparer, this._locales);
   }
 
   /**
@@ -587,8 +589,8 @@ class Linq<T> {
  * calling its toDictionary, toLookup, toList or toArray methods
  */
 class OrderedList<T> extends Linq<T> {
-  constructor(elements: T[], private _comparer: (a: T, b: T) => number) {
-    super(elements);
+  constructor(elements: T[], private _comparer: (a: T, b: T) => number, locales: string | string[]) {
+    super(elements, locales);
     this._elements.sort(this._comparer);
   }
 
@@ -597,7 +599,7 @@ class OrderedList<T> extends Linq<T> {
    * @override
    */
   public thenBy(keySelector: (key: T) => any): Linq<T> {
-    return new OrderedList(this._elements, Tools.composeComparers(this._comparer, Tools.keyComparer(keySelector, false)));
+    return new OrderedList(this._elements, Tools.composeComparers(this._comparer, Tools.keyComparer(keySelector, false, this._locales)), this._locales);
   }
 
   /**
@@ -605,7 +607,7 @@ class OrderedList<T> extends Linq<T> {
    * @override
    */
   public thenByDescending(keySelector: (key: T) => any): Linq<T> {
-    return new OrderedList(this._elements, Tools.composeComparers(this._comparer, Tools.keyComparer(keySelector, true)));
+    return new OrderedList(this._elements, Tools.composeComparers(this._comparer, Tools.keyComparer(keySelector, true, this._locales)), this._locales);
   }
 }
 
@@ -664,7 +666,7 @@ class Tools {
   /**
    * Key comparer
    */
-  static keyComparer = <T>(_keySelector: (key: T) => string, descending?: boolean): ((a: T, b: T) => number) => {
+  static keyComparer = <T>(_keySelector: (key: T) => string, descending?: boolean, locales?: string | string[]): ((a: T, b: T) => number) => {
     // common comparer
     const _comparer = (sortKeyA, sortKeyB): number => {
       if (sortKeyA > sortKeyB) {
@@ -678,12 +680,22 @@ class Tools {
 
     // string comparer
     const _stringComparer = (sortKeyA, sortKeyB): number => {
-      if (sortKeyA.localeCompare(sortKeyB) > 0) {
-        return !descending ? 1 : -1;
-      } else if (sortKeyB.localeCompare(sortKeyA) > 0) {
-        return !descending ? -1 : 1;
+      if (locales) {
+        if (sortKeyA.localeCompare(sortKeyB, locales) > 0) {
+          return !descending ? 1 : -1;
+        } else if (sortKeyB.localeCompare(sortKeyA, locales) > 0) {
+          return !descending ? -1 : 1;
+        } else {
+          return 0;
+        }
       } else {
-        return 0;
+        if (sortKeyA.localeCompare(sortKeyB) > 0) {
+          return !descending ? 1 : -1;
+        } else if (sortKeyB.localeCompare(sortKeyA) > 0) {
+          return !descending ? -1 : 1;
+        } else {
+          return 0;
+        }
       }
     };
 
