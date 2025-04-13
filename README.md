@@ -294,7 +294,7 @@ const rst = new Linq<Person>(persons)
 
 ```typescript
 interface Person {
-  Code: number;
+  Code: string;
   Name: string;
 }
 const parameters = [
