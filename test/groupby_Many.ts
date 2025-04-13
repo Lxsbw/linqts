@@ -18,18 +18,25 @@ for (let index = 0; index < 200000; index++) {
   ent.id = (index + 1).toString();
   list.push(ent);
 }
+let ent = JSON.parse(JSON.stringify(data));
+ent.id = '200000';
+list.push(ent);
 
-// console.log('list:', list);
-// console.log('list:', list.length);
+console.time('orderBy');
 
-// 分组
+// let resultOr = new Linq(list).orderBy(el => Number(el.id)).toArray();
+let resultOr = new Linq(list).orderByDescending(el => Number(el.id)).toArray();
+
+console.log('resultOr:', resultOr);
+
+console.timeEnd('orderBy');
 
 console.time('groupBy');
+console.log();
 
 let result = new Linq(list).groupBy(el => el.id);
 
-console.log('result:', result);
-
+// console.log('result:', result);
 console.log('list:', list.length);
 console.log('result:', result.length);
 
