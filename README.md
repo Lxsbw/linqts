@@ -6,8 +6,6 @@
 
 https://github.com/kutyel/linq.ts
 
-Thank you
-
 ## Install
 
 ```sh
@@ -37,7 +35,26 @@ const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 const rst = new Linq<number>(numbers).any(x => x < 5);             // => true
 ```
 
-### 3. count
+### 3. average
+
+```typescript
+const parameters = [
+  { Age: 0, Name: '正一郎' },
+  { Age: 0.6, Name: '清次郎' },
+  { Age: 0.09, Name: '誠三郎' },
+  { Age: 0, Name: '征史郎' },
+  { Age: 0, Name: '征史郎' },
+  { Age: 0, Name: '征史郎' },
+  { Age: 0, Name: '征史郎' },
+  { Age: 0, Name: '征史郎' },
+  { Age: 0, Name: '征史郎' },
+  { Age: 0, Name: '征史郎' },
+];
+
+const rst = new Linq<number>(parameters).average(x => x.Age); // => 0.069
+```
+
+### 4. count
 
 ```typescript
 const strArr = ['正一郎', '清次郎', '誠三郎', '征史郎'];
@@ -47,7 +64,7 @@ const rstStr = new Linq(strArr).count();                           // => 4
 const rstInt = new Linq<number>(intArr).count(x => x % 2 === 0);   // => 3
 ```
 
-### 4. where & toArray
+### 5. where & toArray
 
 ```typescript
 const intArr = [0, 1, 2, 3, 4];
@@ -55,7 +72,7 @@ const intArr = [0, 1, 2, 3, 4];
 const rst = new Linq<number>(intArr).where(x => x % 2 === 0).toArray();  // => [ 0, 2, 4 ]
 ```
 
-### 5. select & toArray
+### 6. select & toArray
 
 ```typescript
 const parameters = [
@@ -76,7 +93,7 @@ const rst = new Linq(parameters)
 // ]
 ```
 
-### 6. selectMany
+### 7. selectMany
 
 ```typescript
 const parameters = [
@@ -90,7 +107,7 @@ const rst = new Linq(parameters).selectMany(x => new Linq(x.Numbers)).toArray();
 
 ```
 
-### 7. distinct
+### 8. distinct
 
 ```typescript
 const intArr = [0, 1, 3, 3, 2];
@@ -105,7 +122,7 @@ const rstInt = new Linq(intArr).distinct().toArray();              // => [ 0, 1,
 const rstObj = new Linq(parameters).select(x => x.Name).distinct().toArray(); // => [ "正一郎", "清次郎", "征史郎" ]
 ```
 
-### 8. distinctBy
+### 9. distinctBy
 
 ```typescript
 const data = [
@@ -132,7 +149,7 @@ const rstKeys = new Linq(data)
 // ]
 ```
 
-### 9. distinctMap
+### 10. distinctMap
 
 ```javascript
 interface DisType {
@@ -160,7 +177,7 @@ let dataC_G = new Linq<DisType>(parameters)
   .toArray(); // => [ { Name: '正一郎' }, { Name: '清次郎' }, { Name: '征史郎' } ]
 ```
 
-### 10. first & firstOrDefault
+### 11. first & firstOrDefault
 
 ```typescript
 const numbers = [1, 2, 3, 5, 7, 11];
@@ -176,7 +193,7 @@ const rstObj = new Linq<Person>(parameters).firstOrDefault(x => x.ID === 30);  /
 const rstObj = new Linq<Person>(parameters).firstOrDefault(x => x.ID === 42);  // => { ID: 42, Name: '征史郎' }
 ```
 
-### 11. remove
+### 12. remove
 
 ```typescript
 let numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -186,7 +203,7 @@ new Linq(numbers).remove(6);
 console.log(numbers.length);                                    // => 9
 ```
 
-### 12. orderBy & orderByDescending
+### 13. orderBy & orderByDescending
 
 ```typescript
 interface Person {
@@ -219,7 +236,7 @@ const rstDesc = new Linq<Person>(parameters).orderByDescending(x => x.ID).toArra
 
 ```
 
-### 13. thenBy & thenByDescending
+### 14. thenBy & thenByDescending
 
 ```typescript
 interface Person {
@@ -273,7 +290,72 @@ const rst = new Linq<Person>(persons)
 // ]
 ```
 
-### 14. groupBy
+### 15. orderBy local sort
+
+```typescript
+interface Person {
+  Code: number;
+  Name: string;
+}
+const parameters = [
+  { Code: 'S', Name: '诗涵' },
+  { Code: 'F', Name: '芳菲' },
+  // { Code: 'U', Name: '悠悦' },
+  { Code: 'H', Name: '慧琳' },
+  { Code: 'E', Name: '恩琪' },
+  { Code: 'R', Name: '睿萱' },
+  { Code: 'B', Name: '碧琳' },
+  { Code: 'C', Name: '采薇' },
+  { Code: 'T', Name: '天翊' },
+  { Code: 'G', Name: '冠宇' },
+  { Code: 'Q', Name: '绮梦' },
+  { Code: 'M', Name: '梦琪' },
+  // { Code: 'V', Name: '薇雅' },
+  { Code: 'Z', Name: '梓涵' },
+  { Code: 'A', Name: '安雅' },
+  // { Code: 'I', Name: '依诺' },
+  { Code: 'Y', Name: '雅琴' },
+  { Code: 'W', Name: '婉婷' },
+  { Code: 'L', Name: '乐瑶' },
+  { Code: 'K', Name: '可昕' },
+  { Code: 'X', Name: '晓妍' },
+  { Code: 'J', Name: '佳颖' },
+  { Code: 'N', Name: '娜菲' },
+  { Code: 'D', Name: '丹妮' },
+  { Code: 'O', Name: '欧雅' },
+  { Code: 'P', Name: '佩珊' },
+];
+
+const rst = new Linq<Person>(parameters, 'zh-CN').orderBy(x => x.Name).toArray();
+// rst =>
+// [
+//   { Code: 'A', Name: '安雅' },
+//   { Code: 'B', Name: '碧琳' },
+//   { Code: 'C', Name: '采薇' },
+//   { Code: 'D', Name: '丹妮' },
+//   { Code: 'E', Name: '恩琪' },
+//   { Code: 'F', Name: '芳菲' },
+//   { Code: 'G', Name: '冠宇' },
+//   { Code: 'H', Name: '慧琳' },
+//   { Code: 'J', Name: '佳颖' },
+//   { Code: 'K', Name: '可昕' },
+//   { Code: 'L', Name: '乐瑶' },
+//   { Code: 'M', Name: '梦琪' },
+//   { Code: 'N', Name: '娜菲' },
+//   { Code: 'O', Name: '欧雅' },
+//   { Code: 'P', Name: '佩珊' },
+//   { Code: 'Q', Name: '绮梦' },
+//   { Code: 'R', Name: '睿萱' },
+//   { Code: 'S', Name: '诗涵' },
+//   { Code: 'T', Name: '天翊' },
+//   { Code: 'W', Name: '婉婷' },
+//   { Code: 'X', Name: '晓妍' },
+//   { Code: 'Y', Name: '雅琴' },
+//   { Code: 'Z', Name: '梓涵' }
+// ]
+```
+
+### 16. groupBy
 
 ```typescript
 interface GroupObj {
@@ -322,7 +404,7 @@ const rstKeys = new Linq<GroupObj>(data).groupBy(el => {
 // ]
 ```
 
-### 15. join
+### 17. join
 
 ```typescript
 const persons = [
@@ -362,7 +444,7 @@ const rst = new Linq(persons)
 // ]
 ```
 
-### 16. toDictionary
+### 18. toDictionary
 
 ```typescript
 const parameters = [
@@ -392,7 +474,7 @@ const dictionaryObj = new Linq(parameters)
 // ]
 ```
 
-### 17. sum
+### 19. sum
 
 ```typescript
 interface Person {
@@ -409,7 +491,7 @@ const parameters = [
 const rst = new Linq<Person>(parameters).sum(x => x.Age);       // => 118
 ```
 
-### 18. max
+### 20. max
 
 ```typescript
 interface Person {
@@ -426,7 +508,7 @@ const parameters = [
 const rst = new Linq<Person>(parameters).max(x => x.Age);       // => 52
 ```
 
-### 19. min
+### 21. min
 
 ```typescript
 interface Person {
@@ -443,7 +525,7 @@ const parameters = [
 const rst = new Linq<Person>(parameters).min(x => x.Age);       // => 18
 ```
 
-### 20. take
+### 22. take
 
 ```typescript
 const texts = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -451,7 +533,7 @@ const texts = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const rst = new Linq(texts).take(4).toArray();                     // => [ "Sun", "Mon", "Tue", "Wed" ]
 ```
 
-### 21. skip
+### 23. skip
 
 ```typescript
 const texts = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
