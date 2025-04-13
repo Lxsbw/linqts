@@ -51,7 +51,7 @@ const parameters = [
   { Age: 0, Name: '征史郎' },
 ];
 
-const rst = new Linq<number>(parameters).average(x => x.Age); // => 0.069
+const rst = new Linq(parameters).average(x => x.Age); // => 0.069
 ```
 
 ### 4. count
