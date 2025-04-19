@@ -13,7 +13,7 @@ reaultB = new Linq<number>(numbers).any(function (value) {
 });
 
 reaultC = new Linq<number>(numbers).any(x => x < 5);
-// reaultD = new Linq<number>(numbers).All(x => x < 5);
+reaultD = new Linq<number>(numbers).all(x => x < 5);
 
 console.log('reaultA:', reaultA);
 console.log('reaultB:', reaultB);
