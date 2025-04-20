@@ -8,3 +8,5 @@ coverage
 *.js.map
 .idea
 /dist/
+
+!jest.config.js

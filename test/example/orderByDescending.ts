@@ -1,6 +1,6 @@
 let orderedParameters, parameters;
 
-import Linq from '../src/linq';
+import Linq from '../../src/linq';
 interface Person {
   ID: number;
   Name: string;

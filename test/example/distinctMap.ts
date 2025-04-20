@@ -1,6 +1,6 @@
 let dataA, dataB, dataC, dataC_F, dataC_G, dataC_H, parameters;
 
-import Linq from '../src/linq';
+import Linq from '../../src/linq';
 
 interface DisType {
   ID: number;

@@ -1,4 +1,4 @@
-import Linq from '../src/linq';
+import Linq from '../../src/linq';
 
 interface IPet {
   Name: string;

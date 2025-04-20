@@ -1,4 +1,4 @@
-import Linq from '../src/linq';
+import Linq from '../../src/linq';
 
 let parameters = [
   { ID: 0, Age: 52, Name: '正一郎' },

@@ -1,4 +1,4 @@
-import Linq from '../src/linq';
+import Linq from '../../src/linq';
 
 let data = {
   ZWMS_WERKS: '1000',
