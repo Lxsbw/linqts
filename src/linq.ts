@@ -32,8 +32,8 @@ class Linq<T> {
    * Defaults the elements of the list
    */
   constructor(elements: T[] = [], locales: string | string[] = null) {
-    this._elements = [...elements];
-    // this._elements = elements;
+    // this._elements = [...elements];
+    this._elements = elements;
     this._locales = locales;
   }
 
