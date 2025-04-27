@@ -1,4 +1,4 @@
-import Linq from '../src/linq';
+import Linq from '../../src/linq';
 
 const parameters = [
   { ID: 5, Rate: 0.0, Name: '正一郎' },

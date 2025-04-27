@@ -1,4 +1,4 @@
-import Linq from '../src/linq';
+import Linq from '../../src/linq';
 
 const obj1 = { A: '1', B: '2', C: '3'};
 const obj2 = { A: '1', B: '2', C: '3', D: '4'};

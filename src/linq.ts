@@ -13,6 +13,22 @@ class Linq<T> {
   protected _locales: string | string[];
 
   /**
+   * Make the List iterable and Spreadable
+   */
+  *[Symbol.iterator]() {
+    for (let element of this._elements) {
+      yield element;
+    }
+  }
+
+  /**
+   * property represents the Object name
+   */
+  get [Symbol.toStringTag]() {
+    return 'List'; // Expected output: "[object List]"
+  }
+
+  /**
    * Defaults the elements of the list
    */
   constructor(elements: T[] = [], locales: string | string[] = null) {
@@ -65,8 +81,6 @@ class Linq<T> {
   /**
    * Determines whether a sequence contains any elements.
    */
-  public any(): boolean;
-  public any(predicate: PredicateType<T>): boolean;
   public any(predicate?: PredicateType<T>): boolean {
     return predicate ? this._elements.some(predicate) : this._elements.length > 0;
   }
@@ -75,8 +89,6 @@ class Linq<T> {
    * Computes the average of a sequence of number values that are obtained by invoking
    * a transform function on each element of the input sequence.
    */
-  public average(): number;
-  public average(transform: (value?: T, index?: number, list?: T[]) => any): number;
   public average(transform?: (value?: T, index?: number, list?: T[]) => any): number {
     return Tools.calcNumDiv(this.sum(transform), this.count());
   }
@@ -112,8 +124,6 @@ class Linq<T> {
   /**
    * Returns the number of elements in a sequence.
    */
-  public count(): number;
-  public count(predicate: PredicateType<T>): number;
   public count(predicate?: PredicateType<T>): number {
     return predicate ? this.where(predicate).count() : this._elements.length;
   }
@@ -123,14 +133,16 @@ class Linq<T> {
    * in a singleton collection if the sequence is empty.
    */
   public defaultIfEmpty(defaultValue?: T): Linq<T> {
-    return this.count() ? this : new Linq<T>([defaultValue]);
+    return this.count() ? this : new Linq<T>([defaultValue as T]);
   }
 
   /**
    * Returns distinct elements from a sequence by using the default equality comparer to compare values.
    */
   public distinct(): Linq<T> {
-    return this.where((value, index, iter) => (Tools.isObject(value) ? iter.findIndex(obj => Tools.equal(obj, value)) : iter.indexOf(value)) === index);
+    return this.where(
+      (value, index, iter) => (Tools.isObject(value) ? iter && iter.findIndex(obj => Tools.equal(obj as object, value as Record<string, unknown>)) : iter && iter.indexOf(value)) === index
+    );
   }
 
   /**
@@ -148,12 +160,17 @@ class Linq<T> {
       .toArray()
       .reduce(func, new Linq<T>());
   }
+  // public distinctBy(keySelector: (key: T) => string | number): Linq<T> {
+  //   const groups = this.groupBy(keySelector)
+  //   return Object.keys(groups).reduce((res, key) => {
+  //     res.add(groups[key][0])
+  //     return res
+  //   }, new Linq<T>())
+  // }
 
   /**
    * Returns distinct elements from a sequence by using the default equality comparer to compare values and this.select method.
    */
-  public distinctMap<TOut>(): Linq<T | TOut>;
-  public distinctMap<TOut>(selector: (element: T, index: number) => TOut): Linq<T | TOut>;
   public distinctMap<TOut>(selector?: (element: T, index: number) => TOut): Linq<T | TOut> {
     return selector ? this.select(selector).distinct() : this.distinct();
   }
@@ -173,7 +190,7 @@ class Linq<T> {
    * Returns the element at a specified index in a sequence or a default value if the index is out of range.
    */
   public elementAtOrDefault(index: number): T | null {
-    return index < this.count() && index >= 0 ? this._elements[index] : undefined;
+    return index < this.count() && index >= 0 ? this._elements[index] : null;
   }
 
   /**
@@ -186,8 +203,6 @@ class Linq<T> {
   /**
    * Returns the first element of a sequence.
    */
-  public first(): T;
-  public first(predicate: PredicateType<T>): T;
   public first(predicate?: PredicateType<T>): T {
     if (this.count()) {
       return predicate ? this.where(predicate).first() : this._elements[0];
@@ -199,11 +214,12 @@ class Linq<T> {
   /**
    * Returns the first element of a sequence, or a default value if the sequence contains no elements.
    */
-  public firstOrDefault(): T;
-  public firstOrDefault(predicate: PredicateType<T>): T;
   public firstOrDefault(predicate?: PredicateType<T>): T {
     return this.count(predicate) ? this.first(predicate) : undefined;
   }
+  // public firstOrDefault(defaultValue: T): T {
+  //   return this.count() ? this.first() : defaultValue;
+  // }
 
   /**
    * Performs the specified action on each element of the Linq<T>.
@@ -302,8 +318,6 @@ class Linq<T> {
   /**
    * Returns the last element of a sequence.
    */
-  public last(): T;
-  public last(predicate: PredicateType<T>): T;
   public last(predicate?: PredicateType<T>): T {
     if (this.count()) {
       return predicate ? this.where(predicate).last() : this._elements[this.count() - 1];
@@ -315,37 +329,42 @@ class Linq<T> {
   /**
    * Returns the last element of a sequence, or a default value if the sequence contains no elements.
    */
-  public lastOrDefault(): T;
-  public lastOrDefault(predicate: PredicateType<T>): T;
   public lastOrDefault(predicate?: PredicateType<T>): T {
     return this.count(predicate) ? this.last(predicate) : undefined;
   }
+  // public lastOrDefault(defaultValue: T): T {
+  //   return this.count() ? this.last() : defaultValue;
+  // }
 
   /**
    * Returns the maximum value in a generic sequence.
    */
-  public max(): number;
-  public max(selector: (value: T, index: number, array: T[]) => number): number;
   public max(selector?: (value: T, index: number, array: T[]) => number): number {
-    const id = x => x;
-    return Math.max(...this._elements.map(selector || id));
+    const identity = (x: T): number => x as number;
+    return Math.max(...this._elements.map(selector || identity));
   }
+  // public max(selector?: (element: T, index: number) => number): number {
+  //   const identity = (x: T): number => x as number;
+  //   return Math.max(...this.select(selector || identity).toList());
+  // }
 
   /**
    * Returns the minimum value in a generic sequence.
    */
-  public min(): number;
-  public min(selector: (value: T, index: number, array: T[]) => number): number;
   public min(selector?: (value: T, index: number, array: T[]) => number): number {
-    const id = x => x;
-    return Math.min(...this._elements.map(selector || id));
+    const identity = (x: T): number => x as number;
+    return Math.min(...this._elements.map(selector || identity));
   }
+  // public min(selector?: (element: T, index: number) => number): number {
+  //   const identity = (x: T): number => x as number;
+  //   return Math.min(...this.select(selector || identity).toList());
+  // }
 
   /**
    * Filters the elements of a sequence based on a specified type.
    */
   public ofType<U>(type: any): Linq<U> {
-    let typeName;
+    let typeName: string | null;
     switch (type) {
       case Number:
         typeName = typeof 0;
@@ -409,6 +428,9 @@ class Linq<T> {
   public removeAll(predicate: PredicateType<T>): Linq<T> {
     return this.where(Tools.negate(predicate));
   }
+  // public removeAll(predicate: PredicateType<T>): Linq<T> {
+  //   return this.where((value, index, list) => !predicate(value, index, list));
+  // }
 
   /**
    * Removes the element at the specified index of the Linq<T>.
@@ -463,6 +485,9 @@ class Linq<T> {
   public singleOrDefault(predicate?: PredicateType<T>): T {
     return this.count(predicate) ? this.single(predicate) : undefined;
   }
+  // public singleOrDefault(defaultValue: T): T {
+  //   return this.count() ? this.single() : defaultValue;
+  // }
 
   /**
    * Bypasses a specified number of elements in a sequence and then returns the remaining elements.
@@ -489,8 +514,6 @@ class Linq<T> {
    * Computes the sum of the sequence of number values that are obtained by invoking
    * a transform function on each element of the input sequence.
    */
-  public sum(): number;
-  public sum(transform: (value?: T, index?: number, list?: T[]) => number): number;
   public sum(transform?: (value?: T, index?: number, list?: T[]) => number): number {
     return transform ? this.select(transform).sum() : this.aggregate((ac, v) => (ac = Tools.calcNum(ac, +v)), 0);
   }
@@ -526,14 +549,12 @@ class Linq<T> {
   /**
    * Creates a Dictionary<TKey, TValue> from a Linq<T> according to a specified key selector function.
    */
-  public toDictionary<TKey>(key: (key: T) => TKey): Linq<{ Key: TKey; Value: T }>;
-  public toDictionary<TKey, TValue>(key: (key: T) => TKey, value: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }>;
   public toDictionary<TKey, TValue>(key: (key: T) => TKey, value?: (value: T) => TValue): Linq<{ Key: TKey; Value: T | TValue }> {
     return this.aggregate((dicc, v, i) => {
       // dicc[this.select(key).elementAt(i).toString()] = value ? this.select(value).elementAt(i) : v;
       dicc.add({
         Key: this.select(key).elementAt(i),
-        Value: value ? this.select(value).elementAt(i) : v,
+        Value: !!value ? this.select(value).elementAt(i) : v,
       });
       return dicc;
     }, new Linq<{ Key: TKey; Value: T | TValue }>());
@@ -580,6 +601,13 @@ class Linq<T> {
   // public equals<T, U>(param1: T | any, param2: U | any): boolean {
   //   return Tools.equal(param1, param2);
   // }
+
+  /**
+   * clone deep object.
+   */
+  public cloneDeep<T, Y>(param): T | Y {
+    return Tools.cloneDeep(param);
+  }
 }
 
 /**
@@ -592,6 +620,15 @@ class OrderedList<T> extends Linq<T> {
   constructor(elements: T[], private _comparer: (a: T, b: T) => number, locales: string | string[]) {
     super(elements, locales);
     this._elements.sort(this._comparer);
+  }
+
+  /**
+   * Allows you to get the parent Linq out of the OrderedList
+   * @override
+   * @returns and ordered list turned into a regular Linq<T>
+   */
+  public ToList(): Linq<T> {
+    return new Linq<T>(this._elements);
   }
 
   /**

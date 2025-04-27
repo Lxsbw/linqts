@@ -11,7 +11,9 @@
     "emitDecoratorMetadata": true,
     "declarationDir": "dist",
     "outDir": "dist",
-    "typeRoots": ["node_modules/@types"]
+    // "strict": true,
+    "typeRoots": ["node_modules/@types"],
+    "downlevelIteration": true
   },
   "include": ["src", "test"]
 }
