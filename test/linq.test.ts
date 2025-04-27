@@ -108,6 +108,28 @@ describe('Group 1:', () => {
     }
   });
 
+  test('ArrayFrom', () => {
+    const pets = new Linq([
+      { Age: 10, Name: 'Barley' },
+      { Age: 4, Name: 'Boots' },
+      { Age: 6, Name: 'Bissy' },
+    ]);
+    const petsFrom = Array.from(pets);
+    for (const pet of petsFrom) {
+      expect(pet.Name.startsWith('B')).toBeTruthy();
+    }
+  });
+
+  test('toSet', () => {
+    const pets = new Linq([
+      { Age: 10, Name: 'Barley' },
+      { Age: 4, Name: 'Boots' },
+      { Age: 6, Name: 'Bissy' },
+    ]);
+    const petsSet = new Set(pets);
+    expect(petsSet.size).toBe(3);
+  });
+
   test('toStringTag', () => {
     const pets = new Linq([]);
     expect(pets.toString() === '[object List]').toBeTruthy();
@@ -198,9 +220,16 @@ describe('Group 1:', () => {
       { Age: 0, Name: '征史郎' },
     ];
 
+    const numbersQi = [
+      { Age: 0.2, Name: '正一郎' },
+      { Age: 0.3, Name: '清次郎' },
+      { Age: 0.5, Name: '誠三郎' },
+    ];
+
     // expect(new Linq(numbers).average(x => x.Age)).toBe(0.4);
     expect(new Linq(numbers).average(x => x.Age)).toBeCloseTo(0.4);
     expect(new Linq(numbers10).average(x => x.Age)).toBeCloseTo(0.069);
+    expect(new Linq(numbersQi).average(x => x.Age)).toBeCloseTo(0.333, 3);
   });
 
   test('Cast', () => {
@@ -433,7 +462,8 @@ describe('Group 1:', () => {
     const b = new Linq([2, 1, 0, -1, -2]);
     expect(a.elementAtOrDefault(0)).toBe('hey');
     expect(b.elementAtOrDefault(2)).toBe(0);
-    expect(a.elementAtOrDefault(4)).toBeUndefined;
+    expect(a.elementAtOrDefault(4)).toBeNull();
+    // expect(a.elementAtOrDefault(4)).toBeUndefined();
   });
 
   test('Except', () => {
@@ -505,6 +535,62 @@ describe('Group 2:', () => {
         ],
       },
       { key: { id: 2, category: 'vegetables' }, count: 1, elements: [{ id: 2, name: 'two', category: 'vegetables', countries: ['Italy', 'Germany'] }] },
+    ]);
+
+    const dataManyType = [
+      { id: 1, name: 'one', category: 'fruits', countries: ['lxsbw', 'xliecz'] },
+      { id: 1, name: 'one', category: 'fruits', countries: ['Italy', 'Austria'] },
+      { id: 2, name: 'two', category: 'vegetables', countries: ['Italy', 'Germany'] },
+      { id: 2, name: 'two', category: null, countries: ['Italy', 'Germany'] },
+      { id: 2, name: 'two', category: undefined, countries: ['Italy', 'Germany'] },
+      { id: 2, name: 'two', category: '', countries: ['Italy', 'Germany'] },
+      { id: 2, name: 'two', category: ' ', countries: ['Italy', 'Germany'] },
+      { id: 2, name: 'two', category: '  ', countries: ['Italy', 'Germany'] },
+      { id: 2, name: 'two', category: true, countries: ['Italy', 'Germany'] },
+      { id: 2, name: 'two', category: false, countries: ['Italy', 'Germany'] },
+      { id: 2, name: 'two', countries: ['Italy', 'Germany'] },
+      { id: 2, name: 'two', category: 'true', countries: ['Italy', 'Germany'] },
+      { id: 2, name: 'two', category: 'false', countries: ['Italy', 'Germany'] },
+      { id: 2, name: 'two', category: [1, 2], countries: ['Italy', 'Germany'] },
+      { id: 2, name: 'two', category: [2, 1], countries: ['Italy', 'Germany'] },
+      { id: 2, name: 'two', category: [1, 2], countries: ['Italy', 'Germany'] },
+    ];
+    expect(new Linq(dataManyType).groupBy(el => el.category)).toEqual([
+      {
+        key: 'fruits',
+        count: 2,
+        elements: [
+          { id: 1, name: 'one', category: 'fruits', countries: ['lxsbw', 'xliecz'] },
+          { id: 1, name: 'one', category: 'fruits', countries: ['Italy', 'Austria'] },
+        ],
+      },
+      { key: 'vegetables', count: 1, elements: [{ id: 2, name: 'two', category: 'vegetables', countries: ['Italy', 'Germany'] }] },
+
+      { key: null, count: 1, elements: [{ id: 2, name: 'two', category: null, countries: ['Italy', 'Germany'] }] },
+      {
+        key: undefined,
+        count: 2,
+        elements: [
+          { id: 2, name: 'two', category: undefined, countries: ['Italy', 'Germany'] },
+          { id: 2, name: 'two', countries: ['Italy', 'Germany'] },
+        ],
+      },
+      { key: '', count: 1, elements: [{ id: 2, name: 'two', category: '', countries: ['Italy', 'Germany'] }] },
+      { key: ' ', count: 1, elements: [{ id: 2, name: 'two', category: ' ', countries: ['Italy', 'Germany'] }] },
+      { key: '  ', count: 1, elements: [{ id: 2, name: 'two', category: '  ', countries: ['Italy', 'Germany'] }] },
+      { key: true, count: 1, elements: [{ id: 2, name: 'two', category: true, countries: ['Italy', 'Germany'] }] },
+      { key: false, count: 1, elements: [{ id: 2, name: 'two', category: false, countries: ['Italy', 'Germany'] }] },
+      { key: 'true', count: 1, elements: [{ id: 2, name: 'two', category: 'true', countries: ['Italy', 'Germany'] }] },
+      { key: 'false', count: 1, elements: [{ id: 2, name: 'two', category: 'false', countries: ['Italy', 'Germany'] }] },
+      {
+        key: [1, 2],
+        count: 2,
+        elements: [
+          { id: 2, name: 'two', category: [1, 2], countries: ['Italy', 'Germany'] },
+          { id: 2, name: 'two', category: [1, 2], countries: ['Italy', 'Germany'] },
+        ],
+      },
+      { key: [2, 1], count: 1, elements: [{ id: 2, name: 'two', category: [2, 1], countries: ['Italy', 'Germany'] }] },
     ]);
 
     const dataMany = {
@@ -682,7 +768,7 @@ describe('Group 2:', () => {
 
   test('LastOrDefault', () => {
     expect(new Linq(['hey', 'hola', 'que', 'tal']).lastOrDefault()).toBe('tal');
-    expect(new Linq().lastOrDefault()).toBeUndefined;
+    expect(new Linq().lastOrDefault()).toBeUndefined();
   });
 
   test('Max', () => {
@@ -824,6 +910,9 @@ describe('Group 2:', () => {
     const or2 = new Linq(parametersObj).orderByDescending(x => x.ID).toArray();
     // delete subObj.__proto__.pName; // 用完删除，否则会有影响
 
+    // const noArray = new Linq('noarray string').orderBy(x => x).toArray();
+    // expect(noArray).toEqual('noarray string');
+
     const or = new Linq(parameters).orderByDescending(x => x.ID).toArray();
     expect(or).toEqual([
       { ID: 5, Name: '征史郎' },
@@ -900,6 +989,7 @@ describe('Group 2:', () => {
       { Code: 'R', Name: '睿萱' },
       { Code: 'B', Name: '碧琳' },
       { Code: 'C', Name: '采薇' },
+      { Code: 'C', Name: '采薇' },
       { Code: 'T', Name: '天翊' },
       { Code: 'G', Name: '冠宇' },
       { Code: 'Q', Name: '绮梦' },
@@ -925,6 +1015,7 @@ describe('Group 2:', () => {
       { Code: 'A', Name: '安雅' },
       { Code: 'B', Name: '碧琳' },
       { Code: 'C', Name: '采薇' },
+      { Code: 'C', Name: '采薇' },
       { Code: 'D', Name: '丹妮' },
       { Code: 'E', Name: '恩琪' },
       { Code: 'F', Name: '芳菲' },
@@ -946,6 +1037,8 @@ describe('Group 2:', () => {
       { Code: 'Y', Name: '雅琴' },
       { Code: 'Z', Name: '梓涵' },
     ]);
+
+    expect(new Linq(parameters).orderBy(x => x.Name).count()).toBe(24);
   });
 
   test('Remove', () => {
@@ -1266,5 +1359,24 @@ describe('Group 3:', () => {
     const numbers2 = new Linq([1, 2, 3, 4]);
     const words2 = new Linq(['one', 'two', 'three']);
     expect(words2.zip(numbers2, (first, second) => `${first} ${second}`).toArray()).toEqual(expected);
+  });
+
+  test('cloneDeep', () => {
+    const numbers = [1, 2, 3, 4];
+
+    const toolObj = new Linq();
+
+    const cloneNums = toolObj.cloneDeep(numbers);
+    expect(cloneNums).toEqual([1, 2, 3, 4]);
+    expect(cloneNums === numbers).toBeFalsy();
+
+    const special = [
+      { ID: 0, date: new Date(), regData: new RegExp('abc', 'g') },
+      { ID: 3, date: new Date('2018-02-03 12:10:11'), regData: new RegExp('abcd', 'g') },
+      { ID: 2, date: new Date('2018-02-03 12:10:11.110'), regData: new RegExp('1', 'g') },
+      { ID: 5, date: new Date('2023-02-03'), regData: new RegExp('2', 'g') },
+    ];
+
+    expect(toolObj.cloneDeep<any, any>(special).map(x => x.ID)).toEqual([0, 3, 2, 5]);
   });
 });

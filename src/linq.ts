@@ -602,6 +602,13 @@ class Linq<T> {
   // public equals<T, U>(param1: T | any, param2: U | any): boolean {
   //   return Tools.equal(param1, param2);
   // }
+
+  /**
+   * clone deep object.
+   */
+  public cloneDeep<T, Y>(param): T | Y {
+    return Tools.cloneDeep(param);
+  }
 }
 
 /**
@@ -617,9 +624,9 @@ class OrderedList<T> extends Linq<T> {
   }
 
   /**
-   * Allows you to get the parent List out of the OrderedList
+   * Allows you to get the parent Linq out of the OrderedList
    * @override
-   * @returns and ordered list turned into a regular List<T>
+   * @returns and ordered list turned into a regular Linq<T>
    */
   public ToList(): Linq<T> {
     return new Linq<T>(this._elements);
