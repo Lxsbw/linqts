@@ -32,7 +32,6 @@ class Linq<T> {
    * Defaults the elements of the list
    */
   constructor(elements: T[] = [], locales: string | string[] = null) {
-    // this._elements = [...elements];
     this._elements = elements;
     this._locales = locales;
   }
@@ -340,26 +339,26 @@ class Linq<T> {
   /**
    * Returns the maximum value in a generic sequence.
    */
-  // public max(selector?: (value: T, index: number, array: T[]) => number): number {
-  //   const id = x => x;
-  //   return Math.max(...this._elements.map(selector || id));
-  // }
-  public max(selector?: (element: T, index: number) => number): number {
+  public max(selector?: (value: T, index: number, array: T[]) => number): number {
     const identity = (x: T): number => x as number;
-    return Math.max(...this.select(selector || identity).toList());
+    return Math.max(...this._elements.map(selector || identity));
   }
+  // public max(selector?: (element: T, index: number) => number): number {
+  //   const identity = (x: T): number => x as number;
+  //   return Math.max(...this.select(selector || identity).toList());
+  // }
 
   /**
    * Returns the minimum value in a generic sequence.
    */
-  // public min(selector?: (value: T, index: number, array: T[]) => number): number {
-  //   const id = x => x;
-  //   return Math.min(...this._elements.map(selector || id));
-  // }
-  public min(selector?: (element: T, index: number) => number): number {
+  public min(selector?: (value: T, index: number, array: T[]) => number): number {
     const identity = (x: T): number => x as number;
-    return Math.min(...this.select(selector || identity).toList());
+    return Math.min(...this._elements.map(selector || identity));
   }
+  // public min(selector?: (element: T, index: number) => number): number {
+  //   const identity = (x: T): number => x as number;
+  //   return Math.min(...this.select(selector || identity).toList());
+  // }
 
   /**
    * Filters the elements of a sequence based on a specified type.
