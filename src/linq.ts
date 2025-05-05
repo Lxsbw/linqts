@@ -13,7 +13,15 @@ class Linq<T> {
   protected _locales: string | string[];
 
   /**
-   * Make the List iterable and Spreadable
+   * Defaults the elements of the list
+   */
+  constructor(elements: T[] = [], locales: string | string[] = null) {
+    this._elements = elements;
+    this._locales = locales;
+  }
+
+  /**
+   * Make the Linq iterable and Spreadable
    */
   *[Symbol.iterator]() {
     for (let element of this._elements) {
@@ -25,15 +33,7 @@ class Linq<T> {
    * property represents the Object name
    */
   get [Symbol.toStringTag]() {
-    return 'List'; // Expected output: "[object List]"
-  }
-
-  /**
-   * Defaults the elements of the list
-   */
-  constructor(elements: T[] = [], locales: string | string[] = null) {
-    this._elements = elements;
-    this._locales = locales;
+    return 'Linq'; // Expected output: "[object Linq]"
   }
 
   /**
@@ -284,7 +284,7 @@ class Linq<T> {
   }
 
   /**
-   * Returns the index of the first occurence of an element in the List.
+   * Returns the index of the first occurence of an element in the Linq.
    */
   public indexOf(element: T): number {
     return this._elements.indexOf(element);
@@ -454,7 +454,7 @@ class Linq<T> {
   }
 
   /**
-   * Projects each element of a sequence to a List<any> and flattens the resulting sequences into one sequence.
+   * Projects each element of a sequence to a Linq<any> and flattens the resulting sequences into one sequence.
    */
   public selectMany<TOut extends Linq<any>>(selector: (element: T, index: number) => TOut): TOut {
     return this.aggregate((ac, _, i) => (ac.addRange(this.select(selector).elementAt(i).toArray()), ac), new Linq<TOut>());
