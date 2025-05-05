@@ -132,8 +132,8 @@ describe('Group 1:', () => {
 
   test('toStringTag', () => {
     const pets = new Linq([]);
-    expect(pets.toString() === '[object List]').toBeTruthy();
-    expect(`${pets}` === '[object List]').toBeTruthy();
+    expect(pets.toString() === '[object Linq]').toBeTruthy();
+    expect(`${pets}` === '[object Linq]').toBeTruthy();
   });
 
   test('Add', () => {

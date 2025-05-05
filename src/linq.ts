@@ -33,7 +33,7 @@ class Linq<T> {
    * property represents the Object name
    */
   get [Symbol.toStringTag]() {
-    return 'List'; // Expected output: "[object List]"
+    return 'Linq'; // Expected output: "[object Linq]"
   }
 
   /**
