@@ -797,6 +797,7 @@ class Tools {
    * Build array new reference
    */
   static arrayMap = <T>(array): T => {
+    /* istanbul ignore next */
     if (!this.isArray(array)) {
       return array;
     }
@@ -807,6 +808,7 @@ class Tools {
    * Clone data
    */
   static cloneDeep = <T, Y>(obj: T): T | Y => {
+    /* istanbul ignore next */
     if (typeof structuredClone === 'function') {
       return structuredClone(obj);
     }
@@ -845,6 +847,7 @@ class Tools {
       }
       return result;
     }
+    /* istanbul ignore next */
     throw new Error("Unable to copy param! Its type isn't supported.");
   };
 
