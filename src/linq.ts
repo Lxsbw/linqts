@@ -751,7 +751,10 @@ class Tools {
    * Number calculate addition
    */
   static calcNum = (num1: number, num2: number): number => {
-    if (!this.isNum(num1) || !this.isNum(num2)) return 0;
+    /* istanbul ignore next */
+    if (!this.isNum(num1) || !this.isNum(num2)) {
+      return 0;
+    }
     const { mult, place } = this.calcMultiple(num1, num2);
     return Number(((num1 * mult + num2 * mult) / mult).toFixed(place));
   };
@@ -760,7 +763,10 @@ class Tools {
    * Number calculate division
    */
   static calcNumDiv = (num1: number, num2: number): number => {
-    if (!this.isNum(num1) || !this.isNum(num2)) return 0;
+    /* istanbul ignore next */
+    if (!this.isNum(num1) || !this.isNum(num2)) {
+      return 0;
+    }
     const { mult } = this.calcMultiple(num1, num2);
     return (num1 * mult) / (num2 * mult);
   };

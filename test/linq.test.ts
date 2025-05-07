@@ -1039,6 +1039,7 @@ describe('Group 2:', () => {
     ]);
 
     expect(new Linq(parameters).orderBy(x => x.Name).count()).toBe(24);
+    expect(new Linq(parameters).orderByDescending(x => x.Name).count()).toBe(24);
   });
 
   test('Remove', () => {
