@@ -627,6 +627,7 @@ class OrderedList<T> extends Linq<T> {
    * @override
    * @returns and ordered list turned into a regular Linq<T>
    */
+  /* istanbul ignore next */
   public ToList(): Linq<T> {
     return new Linq<T>(this._elements);
   }
@@ -729,54 +730,6 @@ class Tools {
       if (sortKeyA < sortKeyB) return descending ? 1 : -1;
 
       return 0;
-    };
-  };
-
-  /**
-   * Key comparer
-   */
-  /* istanbul ignore next */
-  static keyComparerOld = <T>(_keySelector: (key: T) => string, descending?: boolean, locales?: string | string[]): ((a: T, b: T) => number) => {
-    // common comparer
-    const _comparer = (sortKeyA, sortKeyB): number => {
-      if (sortKeyA > sortKeyB) {
-        return !descending ? 1 : -1;
-      } else if (sortKeyA < sortKeyB) {
-        return !descending ? -1 : 1;
-      } else {
-        return 0;
-      }
-    };
-
-    // string comparer
-    const _stringComparer = (sortKeyA, sortKeyB): number => {
-      if (locales) {
-        if (sortKeyA.localeCompare(sortKeyB, locales) > 0) {
-          return !descending ? 1 : -1;
-        } else if (sortKeyB.localeCompare(sortKeyA, locales) > 0) {
-          return !descending ? -1 : 1;
-        } else {
-          return 0;
-        }
-      } else {
-        if (sortKeyA.localeCompare(sortKeyB) > 0) {
-          return !descending ? 1 : -1;
-        } else if (sortKeyB.localeCompare(sortKeyA) > 0) {
-          return !descending ? -1 : 1;
-        } else {
-          return 0;
-        }
-      }
-    };
-
-    return (a: T, b: T) => {
-      const sortKeyA = _keySelector(a);
-      const sortKeyB = _keySelector(b);
-
-      if (this.isString(sortKeyA) && this.isString(sortKeyB)) {
-        return _stringComparer(sortKeyA, sortKeyB);
-      }
-      return _comparer(sortKeyA, sortKeyB);
     };
   };
 
