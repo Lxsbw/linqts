@@ -704,6 +704,39 @@ class Tools {
    * Key comparer
    */
   static keyComparer = <T>(_keySelector: (key: T) => string, descending?: boolean, locales?: string | string[]): ((a: T, b: T) => number) => {
+    const isString = Tools.isString;
+
+    return (a, b) => {
+      const sortKeyA = _keySelector(a);
+      const sortKeyB = _keySelector(b);
+
+      // Handle null or undefined
+      const isNullishA = sortKeyA === null || sortKeyA === undefined;
+      const isNullishB = sortKeyB === null || sortKeyB === undefined;
+
+      if (isNullishA && isNullishB) return 0;
+      if (isNullishA) return descending ? -1 : 1;
+      if (isNullishB) return descending ? 1 : -1;
+
+      // String comparison
+      if (isString(sortKeyA) && isString(sortKeyB)) {
+        const result = locales ? sortKeyA.localeCompare(sortKeyB, locales) : sortKeyA.localeCompare(sortKeyB);
+        return descending ? -result : result;
+      }
+
+      // Fallback: number or other types comparison
+      if (sortKeyA > sortKeyB) return descending ? -1 : 1;
+      if (sortKeyA < sortKeyB) return descending ? 1 : -1;
+
+      return 0;
+    };
+  };
+
+  /**
+   * Key comparer
+   */
+  /* istanbul ignore next */
+  static keyComparerOld = <T>(_keySelector: (key: T) => string, descending?: boolean, locales?: string | string[]): ((a: T, b: T) => number) => {
     // common comparer
     const _comparer = (sortKeyA, sortKeyB): number => {
       if (sortKeyA > sortKeyB) {
