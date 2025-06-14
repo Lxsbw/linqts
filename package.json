@@ -1,6 +1,6 @@
 {
   "name": "@lxsbw/linqts",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "Linq + TypeScript",
   "es2015": "index.ts",
   "source": "index.ts",
