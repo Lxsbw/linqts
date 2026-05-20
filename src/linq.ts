@@ -605,7 +605,7 @@ class Linq<T> {
   /**
    * clone deep object.
    */
-  public cloneDeep<T, Y>(param): T | Y {
+  public cloneDeep<TClone = T>(param: TClone): TClone {
     return Tools.cloneDeep(param);
   }
 }
@@ -799,45 +799,98 @@ class Tools {
   /**
    * Clone data
    */
-  static cloneDeep = <T, Y>(obj: T): T | Y => {
+  static cloneDeep = <T>(obj: T, seen?: WeakMap<object, any>): T => {
     /* istanbul ignore next */
-    if (typeof structuredClone === 'function') {
+    if (!seen && typeof structuredClone === 'function') {
       return structuredClone(obj);
     }
 
-    let result;
     // Handle the 3 simple types, and null or undefined
     if (null === obj || 'object' !== typeof obj) {
       return obj;
     }
+
+    const source = obj as any;
+    const refs = seen || new WeakMap<object, any>();
+    if (refs.has(source)) {
+      return refs.get(source);
+    }
+
+    const cloneProperties = (source: any, target: any): any => {
+      Reflect.ownKeys(source).forEach((key: PropertyKey) => {
+        if (Tools.isArray(source) && key === 'length') {
+          return;
+        }
+
+        const descriptor = Object.getOwnPropertyDescriptor(source, key);
+        if (!descriptor) {
+          return;
+        }
+        if (Object.prototype.hasOwnProperty.call(descriptor, 'value')) {
+          descriptor.value = this.cloneDeep(descriptor.value, refs);
+        }
+        Object.defineProperty(target, key, descriptor);
+      });
+      return target;
+    };
+
+    let result: any;
     // Handle Date
-    if (obj instanceof Date) {
-      result = new Date();
-      result.setTime(obj.getTime());
-      return result;
+    if (source instanceof Date) {
+      result = new Date(source.getTime());
+      refs.set(source, result);
+      return cloneProperties(source, result);
     }
     // Handle RegExp
-    if (obj instanceof RegExp) {
-      result = obj;
-      return result;
+    if (source instanceof RegExp) {
+      result = new RegExp(source.source, source.flags);
+      result.lastIndex = source.lastIndex;
+      refs.set(source, result);
+      return cloneProperties(source, result);
+    }
+    // Handle Map
+    if (source instanceof Map) {
+      result = new Map();
+      refs.set(source, result);
+      source.forEach((value, key) => {
+        result.set(this.cloneDeep(key, refs), this.cloneDeep(value, refs));
+      });
+      return cloneProperties(source, result);
+    }
+    // Handle Set
+    if (source instanceof Set) {
+      result = new Set();
+      refs.set(source, result);
+      source.forEach(value => {
+        result.add(this.cloneDeep(value, refs));
+      });
+      return cloneProperties(source, result);
+    }
+    // Handle ArrayBuffer
+    if (source instanceof ArrayBuffer) {
+      result = source.slice(0);
+      refs.set(source, result);
+      return cloneProperties(source, result);
     }
     // Handle Array
-    if (obj instanceof Array) {
-      result = [];
-      for (let i in obj) {
-        result.push(this.cloneDeep(obj[i]));
-      }
-      return result;
+    if (source instanceof Array) {
+      result = new Array(source.length);
+      refs.set(source, result);
+      return cloneProperties(source, result);
+    }
+    // Handle typed arrays and DataView
+    if (ArrayBuffer.isView(source)) {
+      const view = source as any;
+      const clonedBuffer = this.cloneDeep(view.buffer, refs) as ArrayBuffer;
+      result = view instanceof DataView ? new DataView(clonedBuffer, view.byteOffset, view.byteLength) : new view.constructor(clonedBuffer, view.byteOffset, view.length);
+      refs.set(source, result);
+      return cloneProperties(source, result);
     }
     // Handle Object
-    if (obj instanceof Object) {
-      result = {};
-      for (let i in obj) {
-        if (obj.hasOwnProperty(i)) {
-          result[i] = this.cloneDeep(obj[i]);
-        }
-      }
-      return result;
+    if (source instanceof Object) {
+      result = Object.create(Object.getPrototypeOf(source));
+      refs.set(source, result);
+      return cloneProperties(source, result);
     }
     /* istanbul ignore next */
     throw new Error("Unable to copy param! Its type isn't supported.");
@@ -846,41 +899,54 @@ class Tools {
   /**
    * Generate Hash
    */
-  static getHash = <T>(obj: T): String => {
-    let hashValue = '';
-
-    const typeOf = (obj): String => {
-      return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
+  static getHash = <T>(obj: T): string => {
+    const typeOf = (value: unknown): string => {
+      return Object.prototype.toString.call(value).slice(8, -1).toLowerCase();
     };
 
-    const generateHash = (value): String => {
+    const generateHash = (value: unknown): string => {
       const type = typeOf(value);
       switch (type) {
-        case 'object':
-          const keys = Object.keys(value).sort();
-          keys.forEach(key => {
-            hashValue += `${key}:${generateHash(value[key])};`;
-          });
-          break;
+        case 'object': {
+          const source = value as Record<string, unknown>;
+          return `object:{${Object.keys(source)
+            .sort()
+            .map(key => `${generateHash(key)}:${generateHash(source[key])}`)
+            .join('|')}}`;
+        }
         case 'array':
-          value.forEach(item => {
-            hashValue += `${generateHash(item)},`;
-          });
-          break;
+          return `array:[${(value as unknown[]).map(item => generateHash(item)).join('|')}]`;
+
+        case 'date':
+          return `date:${(value as Date).getTime()}`;
+
+        case 'regexp':
+          return `regexp:${(value as RegExp).toString()}`;
+
+        case 'number':
+          return `number:${Number.isNaN(value as number) ? 'NaN' : value}`;
+
+        case 'string':
+          return `string:${JSON.stringify(value)}`;
+
         case 'boolean':
-          hashValue += `boolean<>_<>_<>${value.toString()}`;
-          break;
+          return `boolean:${value}`;
+
         case 'null':
-          hashValue += 'null<>_<>_<>';
-          break;
+          return 'null';
+
         case 'undefined':
-          hashValue += 'undefined<>_<>_<>';
-          break;
+          return 'undefined';
+
+        case 'symbol':
+          return `symbol:${String(value)}`;
+
+        case 'function':
+          return `function:${String(value)}`;
+
         default:
-          hashValue += value ? value.toString() : '';
-          break;
+          return `${type}:${String(value)}`;
       }
-      return hashValue;
     };
     return generateHash(obj);
   };
