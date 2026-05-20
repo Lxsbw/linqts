@@ -1,6 +1,6 @@
 import Linq from '../../src/linq';
 class Dog {
-  Name: string;
+  Name!: string;
 }
 
 let parameters = [

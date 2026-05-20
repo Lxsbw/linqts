@@ -1,4 +1,4 @@
-type PredicateType<T> = (value?: T, index?: number, list?: T[]) => boolean;
+type PredicateType<T> = (value: T, index: number, list: T[]) => boolean;
 interface GroupType<T> {
   key?: any;
   count?: number;
@@ -10,12 +10,12 @@ interface GroupType<T> {
  */
 class Linq<T> {
   protected _elements: T[];
-  protected _locales: string | string[];
+  protected _locales: string | string[] | null;
 
   /**
    * Defaults the elements of the list
    */
-  constructor(elements: T[] = [], locales: string | string[] = null) {
+  constructor(elements: T[] = [], locales: string | string[] | null = null) {
     this._elements = elements;
     this._locales = locales;
   }
@@ -67,7 +67,7 @@ class Linq<T> {
   /**
    * Applies an accumulator function over a sequence.
    */
-  public aggregate<U>(accumulator: (accum: U, value?: T, index?: number, list?: T[]) => any, initialValue?: U): any {
+  public aggregate<U>(accumulator: (accum: U, value: T, index: number, list: T[]) => U, initialValue: U): U {
     return this._elements.reduce(accumulator, initialValue);
   }
 
@@ -89,7 +89,7 @@ class Linq<T> {
    * Computes the average of a sequence of number values that are obtained by invoking
    * a transform function on each element of the input sequence.
    */
-  public average(transform?: (value?: T, index?: number, list?: T[]) => any): number {
+  public average(transform?: (value: T, index: number, list: T[]) => any): number {
     return Tools.calcNumDiv(this.sum(transform), this.count());
   }
 
@@ -152,7 +152,7 @@ class Linq<T> {
     const groups: any = this.groupBy(keySelector);
     const func = function (res: Linq<T>, key: T) {
       const curr = new Linq<GroupType<T>>(groups).firstOrDefault(x => Tools.equal(x.key, key));
-      res.add(curr.elements[0]);
+      res.add(curr!.elements![0]!);
       return res;
     };
     return new Linq<GroupType<T>>(groups)
@@ -180,7 +180,7 @@ class Linq<T> {
    */
   public elementAt(index: number): T {
     if (index < this.count() && index >= 0) {
-      return this._elements[index];
+      return this._elements[index]!;
     } else {
       throw new Error('ArgumentOutOfRangeException: index is less than 0 or greater than or equal to the number of elements in source.');
     }
@@ -205,7 +205,7 @@ class Linq<T> {
    */
   public first(predicate?: PredicateType<T>): T {
     if (this.count()) {
-      return predicate ? this.where(predicate).first() : this._elements[0];
+      return predicate ? this.where(predicate).first() : this._elements[0]!;
     } else {
       throw new Error('InvalidOperationException: The source sequence is empty.');
     }
@@ -214,7 +214,7 @@ class Linq<T> {
   /**
    * Returns the first element of a sequence, or a default value if the sequence contains no elements.
    */
-  public firstOrDefault(predicate?: PredicateType<T>): T {
+  public firstOrDefault(predicate?: PredicateType<T>): T | undefined {
     return this.count(predicate) ? this.first(predicate) : undefined;
   }
   // public firstOrDefault(defaultValue: T): T {
@@ -224,7 +224,7 @@ class Linq<T> {
   /**
    * Performs the specified action on each element of the Linq<T>.
    */
-  public forEach(action: (value?: T, index?: number, list?: T[]) => any): void {
+  public forEach(action: (value: T, index: number, list: T[]) => any): void {
     return this._elements.forEach(action);
   }
 
@@ -253,21 +253,21 @@ class Linq<T> {
    * a little data.
    */
   public groupByMini<TOut, TResult = T>(grouper: (key: T) => TOut, mapper: (element: T) => TResult = val => val as unknown as TResult): TResult[] {
-    const initialValue: TResult[] = [];
+    const initialValue: GroupType<TResult>[] = [];
     const func = function (ac: GroupType<TResult>[], v: T) {
       const key = grouper(v);
       const existingGroup = new Linq<GroupType<TResult>>(ac).firstOrDefault(x => Tools.equal(x.key, key));
       const mappedValue = mapper(v);
       if (existingGroup) {
-        existingGroup.elements.push(mappedValue);
-        existingGroup.count++;
+        existingGroup.elements!.push(mappedValue);
+        existingGroup.count!++;
       } else {
         const existingMap = { key: key, count: 1, elements: [mappedValue] };
         ac.push(existingMap);
       }
       return ac;
     };
-    return this.aggregate(func, initialValue);
+    return this.aggregate(func, initialValue) as TResult[];
   }
 
   /**
@@ -320,7 +320,7 @@ class Linq<T> {
    */
   public last(predicate?: PredicateType<T>): T {
     if (this.count()) {
-      return predicate ? this.where(predicate).last() : this._elements[this.count() - 1];
+      return predicate ? this.where(predicate).last() : this._elements[this.count() - 1]!;
     } else {
       throw Error('InvalidOperationException: The source sequence is empty.');
     }
@@ -329,7 +329,7 @@ class Linq<T> {
   /**
    * Returns the last element of a sequence, or a default value if the sequence contains no elements.
    */
-  public lastOrDefault(predicate?: PredicateType<T>): T {
+  public lastOrDefault(predicate?: PredicateType<T>): T | undefined {
     return this.count(predicate) ? this.last(predicate) : undefined;
   }
   // public lastOrDefault(defaultValue: T): T {
@@ -426,7 +426,7 @@ class Linq<T> {
    * Removes all the elements that match the conditions defined by the specified predicate.
    */
   public removeAll(predicate: PredicateType<T>): Linq<T> {
-    return this.where(Tools.negate(predicate));
+    return this.where((value, index, list) => !predicate(value, index, list));
   }
   // public removeAll(predicate: PredicateType<T>): Linq<T> {
   //   return this.where((value, index, list) => !predicate(value, index, list));
@@ -449,7 +449,7 @@ class Linq<T> {
   /**
    * Projects each element of a sequence into a new form.
    */
-  public select<TOut>(selector: (element: T, index: number) => TOut): Linq<TOut> {
+  public select<TOut>(selector: (element: T, index: number, list: T[]) => TOut): Linq<TOut> {
     return new Linq<TOut>(this._elements.map(selector));
   }
 
@@ -457,7 +457,7 @@ class Linq<T> {
    * Projects each element of a sequence to a Linq<any> and flattens the resulting sequences into one sequence.
    */
   public selectMany<TOut extends Linq<any>>(selector: (element: T, index: number) => TOut): TOut {
-    return this.aggregate((ac, _, i) => (ac.addRange(this.select(selector).elementAt(i).toArray()), ac), new Linq<TOut>());
+    return this.aggregate((ac, _, i) => (ac.addRange(this.select(selector).elementAt(i).toArray()), ac), new Linq<any>()) as TOut;
   }
 
   /**
@@ -482,7 +482,7 @@ class Linq<T> {
    * Returns the only element of a sequence, or a default value if the sequence is empty;
    * this method throws an exception if there is more than one element in the sequence.
    */
-  public singleOrDefault(predicate?: PredicateType<T>): T {
+  public singleOrDefault(predicate?: PredicateType<T>): T | undefined {
     return this.count(predicate) ? this.single(predicate) : undefined;
   }
   // public singleOrDefault(defaultValue: T): T {
@@ -507,14 +507,14 @@ class Linq<T> {
    * Bypasses elements in a sequence as long as a specified condition is true and then returns the remaining elements.
    */
   public skipWhile(predicate: PredicateType<T>): Linq<T> {
-    return this.skip(this.aggregate(ac => (predicate(this.elementAt(ac)) ? ++ac : ac), 0));
+    return this.skip(this.aggregate(ac => (predicate(this.elementAt(ac), ac, this._elements) ? ++ac : ac), 0));
   }
 
   /**
    * Computes the sum of the sequence of number values that are obtained by invoking
    * a transform function on each element of the input sequence.
    */
-  public sum(transform?: (value?: T, index?: number, list?: T[]) => number): number {
+  public sum(transform?: (value: T, index: number, list: T[]) => number): number {
     return transform ? this.select(transform).sum() : this.aggregate((ac, v) => (ac = Tools.calcNum(ac, +v)), 0);
   }
 
@@ -536,7 +536,7 @@ class Linq<T> {
    * Returns elements from a sequence as long as a specified condition is true.
    */
   public takeWhile(predicate: PredicateType<T>): Linq<T> {
-    return this.take(this.aggregate(ac => (predicate(this.elementAt(ac)) ? ++ac : ac), 0));
+    return this.take(this.aggregate(ac => (predicate(this.elementAt(ac), ac, this._elements) ? ++ac : ac), 0));
   }
 
   /**
@@ -554,7 +554,7 @@ class Linq<T> {
       // dicc[this.select(key).elementAt(i).toString()] = value ? this.select(value).elementAt(i) : v;
       dicc.add({
         Key: this.select(key).elementAt(i),
-        Value: !!value ? this.select(value).elementAt(i) : v,
+        Value: value ? this.select(value).elementAt(i) : v,
       });
       return dicc;
     }, new Linq<{ Key: TKey; Value: T | TValue }>());
@@ -617,7 +617,7 @@ class Linq<T> {
  * calling its toDictionary, toLookup, toList or toArray methods
  */
 class OrderedList<T> extends Linq<T> {
-  constructor(elements: T[], private _comparer: (a: T, b: T) => number, locales: string | string[]) {
+  constructor(elements: T[], private _comparer: (a: T, b: T) => number, locales: string | string[] | null) {
     super(elements, locales);
     this._elements.sort(this._comparer);
   }
@@ -680,7 +680,7 @@ class Tools {
     const entriesB = Object.entries(b);
     if (entriesA.length !== entriesB.length) return false;
 
-    const Fn = (entries, _b): boolean => entries.every(([key, val]) => (this.isObject(val) ? this.equal(_b[key], val) : _b[key] === val));
+    const Fn = (entries: [string, any][], _b: Record<string, any>): boolean => entries.every(([key, val]) => (this.isObject(val) ? this.equal(_b[key], val) : _b[key] === val));
 
     return Fn(entriesA, b) && Fn(entriesB, a);
   };
@@ -704,7 +704,7 @@ class Tools {
   /**
    * Key comparer
    */
-  static keyComparer = <T>(_keySelector: (key: T) => string, descending?: boolean, locales?: string | string[]): ((a: T, b: T) => number) => {
+  static keyComparer = <T>(_keySelector: (key: T) => any, descending?: boolean, locales?: string | string[] | null): ((a: T, b: T) => number) => {
     const isString = Tools.isString;
 
     return (a, b) => {
@@ -760,17 +760,17 @@ class Tools {
   /**
    * Check number
    */
-  static isNum = (args): boolean => typeof args === 'number' && !isNaN(args);
+  static isNum = (args: unknown): boolean => typeof args === 'number' && !isNaN(args);
 
   /**
    * Check string
    */
-  static isString = (args): boolean => typeof args === 'string' && args.constructor === String;
+  static isString = (args: unknown): boolean => typeof args === 'string' && args.constructor === String;
 
   /**
    * Check array
    */
-  static isArray = (array): boolean => Array.isArray(array);
+  static isArray = (array: unknown): boolean => Array.isArray(array);
 
   /**
    * Calculation multiple
@@ -788,7 +788,7 @@ class Tools {
   /**
    * Build array new reference
    */
-  static arrayMap = <T>(array): T => {
+  static arrayMap = <T>(array: T[]): T[] => {
     /* istanbul ignore next */
     if (!this.isArray(array)) {
       return array;

@@ -4,7 +4,7 @@ import Linq from '../../src/linq';
 
 interface DisType {
   ID: number;
-  Rate: string;
+  Rate: number;
   Name: string;
 }
 

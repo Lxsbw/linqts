@@ -137,14 +137,14 @@ describe('Group 1:', () => {
   });
 
   test('Add', () => {
-    const list = new Linq([]);
+    const list = new Linq<string>([]);
 
     list.add('hey');
     expect(list.first()).toBe('hey');
   });
 
   test('Append', () => {
-    const list = new Linq([]);
+    const list = new Linq<string>([]);
 
     list.addRange(['hey', "what's", 'up']);
     list.append('there');
@@ -152,7 +152,7 @@ describe('Group 1:', () => {
   });
 
   test('Prepend', () => {
-    const list = new Linq([]);
+    const list = new Linq<string>([]);
 
     list.addRange(['hey', "what's", 'up']);
     list.prepend('there');
@@ -160,7 +160,7 @@ describe('Group 1:', () => {
   });
 
   test('AddRange', () => {
-    const list = new Linq([]);
+    const list = new Linq<string>([]);
 
     list.addRange(['hey', "what's", 'up']);
     expect(list.toArray()).toEqual(['hey', "what's", 'up']);
@@ -298,7 +298,7 @@ describe('Group 1:', () => {
     expect(new Linq(stringList).count()).toBe(4);
     expect(new Linq(intArray).count(x => x % 2 === 0)).toBe(3);
     expect(new Linq(stringList).count(x => x.indexOf('三') >= 0)).toBe(1);
-    expect(new Linq(parameters).count(x => x.sn && x.sn.length > 0)).toBe(3);
+    expect(new Linq(parameters).count(x => !!x.sn && x.sn.length > 0)).toBe(3);
   });
 
   test('DefaultIfEmpty', () => {
@@ -1406,7 +1406,7 @@ describe('Group 3:', () => {
       { Age: 50, Name: 'Bob' },
     ]);
     const dictionary3 = people.toDictionary(x => x.Name).toArray();
-    expect(dictionary3.find(x => x.Key === 'Bob').Value).toEqual({ Age: 50, Name: 'Bob' });
+    expect(dictionary3.find(x => x.Key === 'Bob')!.Value).toEqual({ Age: 50, Name: 'Bob' });
     // expect(dictionary3.find(x => x.Key === 'Bob').Value.Age).toBe(50);
 
     const dictionary4 = people
@@ -1415,7 +1415,7 @@ describe('Group 3:', () => {
         y => y.Age
       )
       .toArray();
-    expect(dictionary4.find(x => x.Key === 'Alice').Value).toBe(25);
+    expect(dictionary4.find(x => x.Key === 'Alice')!.Value).toBe(25);
   });
 
   test('ToList', () => {
@@ -1564,7 +1564,7 @@ describe('Group 3:', () => {
       expect(clone.map.get(cloneMapKey)).toEqual({ count: 1 });
       expect(cloneSetValue).not.toBe(shared);
       expect(cloneSetValue).toBe(clone.sparse[2]);
-      expect(Object.getOwnPropertyDescriptor(clone, sym).enumerable).toBeFalsy();
+      expect(Object.getOwnPropertyDescriptor(clone, sym)!.enumerable).toBeFalsy();
       expect(clone[sym]).toEqual({ secret: true });
       expect(clone[sym]).not.toBe(source[sym]);
     } finally {

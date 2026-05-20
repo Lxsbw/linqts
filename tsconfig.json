@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "target": "es6",
-    "module": "CommonJS",
+    "module": "Node16",
     "lib": ["es2015", "es2016", "es2017", "dom"],
     "sourceMap": true,
     "declaration": true,
@@ -11,9 +11,10 @@
     "emitDecoratorMetadata": true,
     "declarationDir": "dist",
     "outDir": "dist",
-    // "strict": true,
-    "typeRoots": ["node_modules/@types"],
-    "downlevelIteration": true
+    "rootDir": ".",
+    "isolatedModules": true,
+    "types": ["jest"],
+    "typeRoots": ["node_modules/@types"]
   },
   "include": ["src", "test"]
 }

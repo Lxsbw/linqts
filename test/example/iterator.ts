@@ -8,8 +8,8 @@ interface IPet {
 
 class Pet implements IPet {
   public Name: string;
-  public Age: number;
-  public Vaccinated: boolean;
+  public Age?: number;
+  public Vaccinated?: boolean;
 
   constructor(pet: IPet) {
     this.Name = pet.Name;

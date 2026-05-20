@@ -5,7 +5,7 @@ import Linq from '../../src/linq';
 interface Bill {
   bill: number;
   box: string;
-  sn?: string;
+  sn?: string | null;
   status: number;
 }
 
@@ -32,7 +32,7 @@ stringCount = new Linq(stringList).count();
 intCount2 = new Linq<number>(intArray).count(x => x % 2 === 0);
 stringCount2 = new Linq<string>(stringList).count(x => x.indexOf('三') >= 0);
 
-const Qty = new Linq(parameters).count(x => x.sn && x.sn.length > 0);
+const Qty = new Linq(parameters).count(x => !!x.sn && x.sn.length > 0);
 const noQty = new Linq(parameters).where(x => !x.sn);
 
 console.log('intCount:', intCount);
